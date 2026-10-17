@@ -2,6 +2,12 @@
 
 All notable changes to the "lombok-sense" extension will be documented in this file.
 
+## [0.1.1] - 2026-10-17
+
+### Fixed
+- Fixed autocompletion on multiline configurations: proper replacement ranges and fuzzy filter text now resolve key and value suggestions smoothly on empty lines and following newlines.
+- Corrected cursor context resolution on malformed lines after assignment operators.
+
 ## [0.1.0] - 2026-10-17
 
 ### Initial Release

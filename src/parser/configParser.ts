@@ -271,8 +271,8 @@ export function getCursorContext(
   line: number,
   character: number
 ): CursorContext {
-  if (line < 0 || line >= file.nodes.length) {
-    return { kind: 'empty', line, character };
+  if (typeof line !== 'number' || line < 0 || line >= file.nodes.length || !file.nodes[line]) {
+    return { kind: 'empty', line: line ?? 0, character: character ?? 0 };
   }
 
   const node = file.nodes[line];
@@ -336,8 +336,18 @@ export function getCursorContext(
       const start = node.operatorRange.endChar + 1;
       const prefix = rawLine.substring(start, character).trim();
       return {
-        kind: 'key',
-        node,
+        kind: 'value',
+        node: {
+          kind: 'property',
+          line,
+          fullRange: node.fullRange,
+          key: node.partialKey ?? '',
+          keyRange: node.partialKeyRange ?? { line, startChar: 0, endChar: 0 },
+          operator: node.operator ?? '=',
+          operatorRange: node.operatorRange,
+          value: prefix,
+          valueRange: { line, startChar: start, endChar: character }
+        },
         prefix,
         range: { line, startChar: start, endChar: character }
       };

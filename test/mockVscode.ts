@@ -30,14 +30,45 @@ const mockVscode = {
     Value: 11,
     EnumMember: 19
   },
+  CompletionItemTag: {
+    Deprecated: 1
+  },
+  CompletionList: class {
+    items: any[];
+    isIncomplete: boolean;
+    constructor(items: any[] = [], isIncomplete = false) {
+      this.items = items;
+      this.isIncomplete = isIncomplete;
+    }
+  },
+  SnippetString: class {
+    value: string;
+    constructor(value = '') {
+      this.value = value;
+    }
+  },
   MarkdownString: class {
     value = '';
     appendMarkdown(str: string) {
       this.value += str;
     }
   },
-  Range: class {},
-  Position: class {},
+  Position: class {
+    line: number;
+    character: number;
+    constructor(line = 0, character = 0) {
+      this.line = line;
+      this.character = character;
+    }
+  },
+  Range: class {
+    start: { line: number; character: number };
+    end: { line: number; character: number };
+    constructor(startLine = 0, startChar = 0, endLine = 0, endChar = 0) {
+      this.start = { line: startLine, character: startChar };
+      this.end = { line: endLine, character: endChar };
+    }
+  },
   Hover: class {}
 };
 

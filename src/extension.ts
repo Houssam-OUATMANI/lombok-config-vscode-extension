@@ -73,7 +73,7 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.languages.registerCompletionItemProvider(
       LOMBOK_CONFIG_SELECTOR,
       completionProvider,
-      '.', '=', ' ', '+'
+      '.', '=', ' ', '+', '-'
     )
   );
 
