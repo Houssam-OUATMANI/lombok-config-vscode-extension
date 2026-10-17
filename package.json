@@ -106,7 +106,7 @@
     "build-prod": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify",
     "watch": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch --sourcemap",
     "test": "node --test dist-test/test/**/*.test.js",
-    "build-test": "esbuild test/**/*.test.ts --outdir=dist-test/test --format=cjs --platform=node"
+    "build-test": "esbuild test/**/*.test.ts --outdir=dist-test/test --format=cjs --platform=node --bundle"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
