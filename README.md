@@ -1,93 +1,48 @@
-<div align="center">
+# Lombok Sense
 
-<img src="icon.png" alt="Lombok Sense Icon" width="128" height="128" />
+Language support for Project Lombok configuration files (`lombok.config`) in Visual Studio Code.
 
-# Lombok Sense for VS Code
+## Features
 
-**Comprehensive, first-class language intelligence for `lombok.config` files in Visual Studio Code.**
+- **Syntax Highlighting**: Dedicated grammar for `lombok.config` properties, directives (`clear`), assignment operators (`=`, `+=`, `-=`), values, and comments.
+- **Autocompletion**:
+  - **Keys**: Full coverage of official Lombok configuration properties and `.flagUsage` settings.
+  - **Values**: Contextual completion for booleans, strategy enums (`callSuper`, `flagUsage`), and loggers.
+  - **Workspace Annotation Resolution**: Scans workspace Java files (`@interface` declarations and imports) and common framework libraries to autocomplete copyable annotations (e.g. `org.springframework.beans.factory.annotation.Qualifier`, `com.fasterxml.jackson.annotation.JsonProperty`, custom annotations).
+  - **Directives**: Suggests list properties when using the `clear` keyword.
+- **Hover Documentation**: In-editor documentation cards showing official descriptions, categories, types, default values, and deprecation details.
+- **Diagnostics & Linting**:
+  - Unknown keys detection with Levenshtein-based typo suggestions.
+  - Value validation against expected types and permitted enum choices.
+  - Operator validation (`+=` and `-=` restricted to list properties).
+  - Deprecated properties warnings with modern replacements.
+- **Quick Fixes**: One-click actions to correct typos, fix operator misuse, and upgrade deprecated properties.
+- **Document Formatting**: Normalizes whitespace around operators, standardizes directives, and cleans comments.
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![VS Code](https://img.shields.io/badge/VS%20Code-^1.85.0-007ACC.svg)](https://code.visualstudio.com/)
+## Configuration
 
-</div>
+| Setting | Type | Default | Description |
+| --- | --- | --- | --- |
+| `lombokSense.lint.unknownKeys` | `string` | `"warning"` | Severity for unknown configuration keys (`warning`, `error`, `ignore`). |
+| `lombokSense.lint.deprecatedKeys` | `string` | `"warning"` | Severity for deprecated configuration keys. |
+| `lombokSense.lint.invalidValues` | `string` | `"error"` | Severity for invalid or unallowed property values. |
+| `lombokSense.lint.invalidOperators` | `string` | `"error"` | Severity when using `+=` or `-=` on scalar properties. |
+| `lombokSense.format.spaceAroundOperator` | `boolean` | `true` | Enforces a single space around operators (`=`, `+=`, `-=`). |
 
----
+## Supported Properties
 
-## 🌟 Overview
+Lombok Sense maintains a typed schema of the Lombok configuration specification:
 
-**Lombok Sense** provides first-class, zero-latency language support for Project Lombok configuration files (`lombok.config`) in Visual Studio Code.
+- Accessors (`chain`, `fluent`, `prefix`, `capitalization`, `makeFinal`)
+- Builders (`className`, `singular.auto`, `singular.useGuava`)
+- Field Defaults (`defaultPrivate`, `defaultFinal`)
+- Class generation (`equalsAndHashCode.callSuper`, `toString.callSuper`, `includeFieldNames`)
+- Logging (`fieldName`, `fieldIsStatic`, `custom.declaration`)
+- Copyable annotations (`copyableAnnotations`, `accessors.prefix`)
+- Directives (`config.stopBubbling`, `clear <property>`)
+- Governance flags across all Lombok annotations (`lombok.<feature>.flagUsage`)
 
-Enjoy rich autocompletion with live workspace Java annotation resolution, contextual documentation, real-time semantic diagnostics, 1-click Quick Fixes, and automatic document formatting.
-
----
-
-## ✨ Features
-
-### 1. 🎨 Syntax Highlighting & File Recognition
-- Full TextMate grammar designed specifically for `lombok.config`.
-- Highlights directives (`clear`), configuration keys (`lombok.*`, `config.stopBubbling`), assignment operators (`=`, `+=`, `-=`), booleans, enums, numbers, and comments (`#`).
-- Associates any file named `lombok.config` with the dedicated language ID `lombok-config`.
-
-### 2. ⚡ Intelligent Autocompletion (IntelliSense)
-- **Key Completion**: Instant autocomplete for all official Project Lombok configuration keys with type and category details.
-- **Value Completion**: Context-aware completion for allowed values:
-  - Boolean keys (`true`, `false`)
-  - Enums and strategies (e.g., `callSuper = [call | ignore | warn]`)
-  - Flag usage rules (`flagUsage = [allow | warning | error]`)
-  - Framework annotations (`addNullAnnotations = [spring | checkerframework | ...]`)
-  - **Live Workspace Annotation Resolution**: Automatically scans workspace Java files and framework dependencies to autocomplete copyable annotations (e.g. `org.springframework.beans.factory.annotation.Qualifier`, `com.fasterxml.jackson.annotation.JsonProperty`, custom project annotations).
-- **Clear Directive**: Autocompletes `clear` and lists candidates that can be cleared.
-
-### 3. 📖 Quick Documentation (Hover Cards)
-- Hover over any key to view:
-  - Official Project Lombok explanation and documentation.
-  - Property type and category.
-  - Default value.
-  - Allowed options and choices.
-  - Deprecation warnings and recommended replacements.
-- Hover over operators (`=`, `+=`, `-=`) and the `clear` keyword for immediate reference.
-
-### 4. 🔍 Real-Time Diagnostics & Linting
-- **Typo Detection & Unknown Keys**: Flags misspelled or unknown configuration keys and suggests the closest valid Lombok property using Levenshtein distance.
-- **Invalid Values**: Flags non-boolean or unallowed enum values before you build.
-- **Invalid Operators**: Emits an error if list operators (`+=`, `-=`) are used on scalar properties.
-- **Deprecated Properties**: Visually strikes through deprecated properties with a warning and actionable replacement advice.
-
-### 5. 💡 1-Click Quick Fixes (Code Actions)
-- Correct typos in configuration keys with one click.
-- Fix invalid operators (change `+=` to `=` on non-list keys).
-- Replace deprecated configuration keys with modern equivalents.
-
-### 6. 📐 Document Formatting
-- Formats configuration files with standard single-space operator alignment (`key = value`), cleanly indented directives, and normalized comments.
-
----
-
-## ⚙️ Extension Settings
-
-Configure Lombok Sense to fit your team's code standards:
-
-| Setting | Default | Description |
-|---|---|---|
-| `lombokSense.lint.unknownKeys` | `"warning"` | Severity level for unknown or misspelled keys (`"warning"`, `"error"`, or `"ignore"`). |
-| `lombokSense.lint.deprecatedKeys` | `"warning"` | Severity level for deprecated Lombok properties. |
-| `lombokSense.lint.invalidValues` | `"error"` | Severity level for unallowed or malformed values. |
-| `lombokSense.lint.invalidOperators` | `"error"` | Severity level when `+=` or `-=` is used on scalar properties. |
-| `lombokSense.format.spaceAroundOperator` | `true` | Ensures a single space around operators (`=`, `+=`, `-=`) when formatting. |
-
----
-
-## 🚀 Quick Start
-
-1. Open or create any `lombok.config` file in your workspace.
-2. Start typing `lombok.` or press `Ctrl + Space` to browse available configuration keys.
-3. Hover over keys and values for inline documentation.
-4. Press `Shift + Alt + F` (or `Shift + Option + F` on macOS) to format the configuration file.
-
----
-
-## 🧪 Development & Testing
+## Development
 
 ```bash
 # Install dependencies
@@ -96,12 +51,10 @@ npm install
 # Run unit tests
 npm test
 
-# Build extension bundle
-npm run build
+# Build production bundle
+npm run build-prod
 ```
 
----
+## License
 
-## 📄 License
-
-MIT © Lombok Sense Contributors
+MIT © Houssam OUATMANI
