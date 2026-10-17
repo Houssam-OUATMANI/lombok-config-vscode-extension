@@ -1,0 +1,83 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Lombok Config",
+  "scopeName": "source.lombok-config",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#clear-directive"
+    },
+    {
+      "include": "#property-assignment"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "name": "comment.line.number-sign.lombok",
+      "match": "(?<=^|\\s)#.*$"
+    },
+    "clear-directive": {
+      "match": "^\\s*(clear)\\s+([a-zA-Z0-9_.-]+)",
+      "captures": {
+        "1": {
+          "name": "keyword.control.directive.clear.lombok"
+        },
+        "2": {
+          "name": "variable.other.property.lombok"
+        }
+      }
+    },
+    "property-assignment": {
+      "match": "^\\s*([a-zA-Z0-9_.-]+)\\s*(\\+=|-=|=)\\s*(.*?)(?=\\s*#.*$|$)",
+      "captures": {
+        "1": {
+          "name": "variable.other.property.lombok"
+        },
+        "2": {
+          "name": "keyword.operator.assignment.lombok"
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "#values"
+            }
+          ]
+        }
+      }
+    },
+    "values": {
+      "patterns": [
+        {
+          "name": "constant.language.boolean.lombok",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "keyword.other.flag-usage.lombok",
+          "match": "\\b(error|warn|warning|allow|ignore|generate)\\b"
+        },
+        {
+          "name": "constant.language.call-super.lombok",
+          "match": "\\b(call|skip)\\b"
+        },
+        {
+          "name": "constant.language.access-level.lombok",
+          "match": "\\b(PUBLIC|PROTECTED|PACKAGE|PRIVATE|MODULE|NONE)\\b"
+        },
+        {
+          "name": "constant.numeric.lombok",
+          "match": "\\b\\d+\\b"
+        },
+        {
+          "name": "entity.name.type.class.lombok",
+          "match": "([a-zA-Z_$][a-zA-Z\\d_$]*\\.)+[a-zA-Z_$][a-zA-Z\\d_$]*"
+        },
+        {
+          "name": "string.unquoted.lombok",
+          "match": "[^\\s#]+"
+        }
+      ]
+    }
+  }
+}
