@@ -1,7 +1,7 @@
 {
   "name": "lombok-sense",
   "displayName": "Lombok Sense",
-  "description": "IntelliJ-grade language support for Lombok configuration (lombok.config): syntax highlighting, smart autocomplete, hover documentation, diagnostics, quick fixes, and formatting.",
+  "description": "Comprehensive, first-class language support for Lombok configuration (lombok.config): syntax highlighting, smart autocomplete, workspace annotation resolution, hover documentation, diagnostics, quick fixes, and formatting.",
   "version": "0.1.0",
   "publisher": "houssam-ouatmani",
   "engines": {
@@ -114,7 +114,7 @@
     "build-prod": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify",
     "watch": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch --sourcemap",
     "test": "node --test dist-test/test/**/*.test.js",
-    "build-test": "esbuild test/**/*.test.ts --outdir=dist-test/test --format=cjs --platform=node --bundle"
+    "build-test": "esbuild test/**/*.test.ts --outdir=dist-test/test --format=cjs --platform=node --bundle --external:vscode"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

@@ -8,7 +8,7 @@ All notable changes to the "lombok-sense" extension will be documented in this f
 - Complete syntax highlighting grammar for `lombok.config` files.
 - Full metadata catalog of Project Lombok configuration properties and flag usages.
 - Smart autocompletion for keys, values, operators, and directives.
-- IntelliJ IDEA parity hover documentation for keys, values, operators, and `clear`.
+- Rich hover documentation for keys, values, operators, and `clear`.
 - Real-time diagnostic validation:
   - Unknown keys detection with Levenshtein-based suggestions.
   - Invalid value validation (boolean and enum checks).

@@ -4,7 +4,7 @@
 
 # Lombok Sense for VS Code
 
-**IntelliJ IDEA-grade language intelligence for `lombok.config` files in Visual Studio Code.**
+**Comprehensive, first-class language intelligence for `lombok.config` files in Visual Studio Code.**
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -16,9 +16,9 @@
 
 ## 🌟 Overview
 
-**Lombok Sense** bridges the gap between IntelliJ IDEA and Visual Studio Code by bringing full-featured, zero-latency support for Project Lombok configuration files (`lombok.config`).
+**Lombok Sense** provides first-class, zero-latency language support for Project Lombok configuration files (`lombok.config`) in Visual Studio Code.
 
-No more guesswork or switching back to IntelliJ to configure your Lombok properties. Enjoy rich auto-completion, contextual documentation, real-time semantic diagnostics, 1-click Quick Fixes, and automatic document formatting.
+Enjoy rich autocompletion with live workspace Java annotation resolution, contextual documentation, real-time semantic diagnostics, 1-click Quick Fixes, and automatic document formatting.
 
 ---
 
@@ -35,7 +35,8 @@ No more guesswork or switching back to IntelliJ to configure your Lombok propert
   - Boolean keys (`true`, `false`)
   - Enums and strategies (e.g., `callSuper = [call | ignore | warn]`)
   - Flag usage rules (`flagUsage = [allow | warning | error]`)
-  - Framework annotations (`addNullAnnotations = [jetbrains | spring | checkerframework | ...]`)
+  - Framework annotations (`addNullAnnotations = [spring | checkerframework | ...]`)
+  - **Live Workspace Annotation Resolution**: Automatically scans workspace Java files and framework dependencies to autocomplete copyable annotations (e.g. `org.springframework.beans.factory.annotation.Qualifier`, `com.fasterxml.jackson.annotation.JsonProperty`, custom project annotations).
 - **Clear Directive**: Autocompletes `clear` and lists candidates that can be cleared.
 
 ### 3. 📖 Quick Documentation (Hover Cards)

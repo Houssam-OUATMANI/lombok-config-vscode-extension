@@ -4,6 +4,7 @@ import { LombokConfigHoverProvider } from './providers/hoverProvider';
 import { LombokConfigDiagnosticProvider } from './providers/diagnosticProvider';
 import { LombokConfigCodeActionProvider } from './providers/codeActionProvider';
 import { LombokConfigFormattingProvider } from './providers/formattingProvider';
+import { WorkspaceAnnotationService } from './services/workspaceAnnotationService';
 
 const LOMBOK_CONFIG_SELECTOR: vscode.DocumentSelector = [
   { language: 'lombok-config' },
@@ -14,6 +15,9 @@ const LOMBOK_CONFIG_SELECTOR: vscode.DocumentSelector = [
  * Extension activation callback.
  */
 export function activate(context: vscode.ExtensionContext): void {
+  // 0. Workspace Annotation Service (scans workspace Java files & dependencies)
+  const annotationService = new WorkspaceAnnotationService();
+  context.subscriptions.push(annotationService);
   // 1. Diagnostic Collection & Provider
   const diagnosticCollection = vscode.languages.createDiagnosticCollection('lombokSense');
   const diagnosticProvider = new LombokConfigDiagnosticProvider(diagnosticCollection);
@@ -64,7 +68,7 @@ export function activate(context: vscode.ExtensionContext): void {
   }
 
   // 2. Autocompletion Provider
-  const completionProvider = new LombokConfigCompletionProvider();
+  const completionProvider = new LombokConfigCompletionProvider(annotationService);
   context.subscriptions.push(
     vscode.languages.registerCompletionItemProvider(
       LOMBOK_CONFIG_SELECTOR,
@@ -74,7 +78,7 @@ export function activate(context: vscode.ExtensionContext): void {
   );
 
   // 3. Hover Documentation Provider
-  const hoverProvider = new LombokConfigHoverProvider();
+  const hoverProvider = new LombokConfigHoverProvider(annotationService);
   context.subscriptions.push(
     vscode.languages.registerHoverProvider(LOMBOK_CONFIG_SELECTOR, hoverProvider)
   );

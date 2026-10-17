@@ -1,12 +1,18 @@
 import * as vscode from 'vscode';
 import { findProperty, LombokPropertyDef } from '../model/lombokProperties';
 import { parseConfigText, ConfigNode } from '../parser/configParser';
+import { WorkspaceAnnotationService } from '../services/workspaceAnnotationService';
 
 /**
  * Rich documentation hover provider for lombok.config files.
- * Provides IntelliJ-grade Quick Documentation for keys, values, operators, and directives.
+ * Provides comprehensive Quick Documentation for keys, values, operators, and directives.
  */
 export class LombokConfigHoverProvider implements vscode.HoverProvider {
+  private readonly annotationService?: WorkspaceAnnotationService;
+
+  constructor(annotationService?: WorkspaceAnnotationService) {
+    this.annotationService = annotationService;
+  }
   public provideHover(
     document: vscode.TextDocument,
     position: vscode.Position,
@@ -188,6 +194,23 @@ export class LombokConfigHoverProvider implements vscode.HoverProvider {
         return undefined;
       }
       return new vscode.Hover(md, vscodeRange);
+    }
+
+    // Annotation hover for lombok.copyableAnnotations
+    if (key === 'lombok.copyableAnnotations' && this.annotationService) {
+      const match = this.annotationService.getAnnotations().find(a => a.fqcn === value);
+      if (match) {
+        md.appendMarkdown(`### Annotation: \`@${match.simpleName}\`\n\n`);
+        md.appendMarkdown(`**Source**: ${match.source === 'workspace' ? 'Workspace' : 'Framework Library'}\n\n`);
+        md.appendMarkdown(`**Class**: \`${match.fqcn}\`\n\n`);
+        if (match.description) {
+          md.appendMarkdown(`${match.description}\n\n`);
+        }
+        md.appendMarkdown(
+          'Lombok will copy this annotation from fields onto generated getters, setters, withers, and constructors.'
+        );
+        return new vscode.Hover(md, vscodeRange);
+      }
     }
 
     if (prop?.defaultValue === value) {

@@ -1,12 +1,20 @@
 import * as vscode from 'vscode';
 import { ALL_LOMBOK_PROPERTIES, findProperty, LombokPropertyDef } from '../model/lombokProperties';
 import { parseConfigText, getCursorContext } from '../parser/configParser';
+import { WorkspaceAnnotationService } from '../services/workspaceAnnotationService';
 
 /**
  * Intelligent completion provider for lombok.config files.
- * Provides key autocompletion, value autocompletion, and directive completion.
+ * Provides key autocompletion, value autocompletion, directive completion,
+ * and live workspace Java annotation resolution.
  */
 export class LombokConfigCompletionProvider implements vscode.CompletionItemProvider {
+  private readonly annotationService: WorkspaceAnnotationService;
+
+  constructor(annotationService: WorkspaceAnnotationService) {
+    this.annotationService = annotationService;
+  }
+
   public provideCompletionItems(
     document: vscode.TextDocument,
     position: vscode.Position,
@@ -18,7 +26,7 @@ export class LombokConfigCompletionProvider implements vscode.CompletionItemProv
 
     switch (ctx.kind) {
       case 'value':
-        return this.provideValueCompletions(ctx.node.key, ctx.node.operator);
+        return this.provideValueCompletions(ctx.node.key, ctx.node.operator, ctx.prefix);
 
       case 'clearTarget':
         return this.provideClearTargetCompletions();
@@ -112,18 +120,19 @@ export class LombokConfigCompletionProvider implements vscode.CompletionItemProv
   }
 
   /**
-   * Provides value completions based on the property type.
+   * Provides value completions based on the property type and live workspace resolution.
    */
   private provideValueCompletions(
     rawKey: string,
-    operator: string
+    _operator: string,
+    currentPrefix: string
   ): vscode.CompletionItem[] {
     const prop = findProperty(rawKey);
     if (!prop) {
       return [];
     }
 
-    // List properties don't have a rigid enum of values (they accept class names or prefixes)
+    // List properties resolution
     if (prop.type === 'list') {
       if (prop.key === 'lombok.accessors.prefix') {
         const item = new vscode.CompletionItem('m_', vscode.CompletionItemKind.Value);
@@ -131,6 +140,29 @@ export class LombokConfigCompletionProvider implements vscode.CompletionItemProv
         item.documentation = new vscode.MarkdownString('Strips prefix like `m_` from field names when generating accessors.');
         return [item];
       }
+
+      // Dynamic resolution of copyable annotations from workspace & framework indexes
+      if (prop.key === 'lombok.copyableAnnotations') {
+        const annotations = this.annotationService.getAnnotations(currentPrefix);
+        return annotations.map((ann, idx) => {
+          const item = new vscode.CompletionItem(ann.fqcn, vscode.CompletionItemKind.Class);
+          item.detail = `@${ann.simpleName} (${ann.source === 'workspace' ? 'Workspace' : 'Framework'})`;
+          
+          const docs = new vscode.MarkdownString();
+          docs.appendMarkdown(`### \`@${ann.simpleName}\`\n\n`);
+          docs.appendMarkdown(`**Fully Qualified Name**: \`${ann.fqcn}\`\n\n`);
+          if (ann.description) {
+            docs.appendMarkdown(`${ann.description}\n\n`);
+          }
+          docs.appendMarkdown(
+            'Lombok will copy this annotation from fields onto generated getters, setters, withers, and constructors.'
+          );
+          item.documentation = docs;
+          item.sortText = `${idx.toString().padStart(3, '0')}_${ann.fqcn}`;
+          return item;
+        });
+      }
+
       return [];
     }
 
@@ -144,8 +176,6 @@ export class LombokConfigCompletionProvider implements vscode.CompletionItemProv
         const item = new vscode.CompletionItem(val, kind);
         item.detail = prop.defaultValue === val ? `(default) ${val}` : val;
         item.sortText = `${index.toString().padStart(2, '0')}_${val}`;
-
-        // Specific documentation for known values
         item.documentation = this.getValueDocumentation(prop.key, val);
         return item;
       });
