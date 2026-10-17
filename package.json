@@ -3,10 +3,18 @@
   "displayName": "Lombok Sense",
   "description": "IntelliJ-grade language support for Lombok configuration (lombok.config): syntax highlighting, smart autocomplete, hover documentation, diagnostics, quick fixes, and formatting.",
   "version": "0.1.0",
-  "publisher": "lombok-sense",
+  "publisher": "houssam-ouatmani",
   "engines": {
     "vscode": "^1.85.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Houssam-OUATMANI/lombok-config-vscode-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Houssam-OUATMANI/lombok-config-vscode-extension/issues"
+  },
+  "homepage": "https://github.com/Houssam-OUATMANI/lombok-config-vscode-extension#readme",
   "categories": [
     "Programming Languages",
     "Linters",
