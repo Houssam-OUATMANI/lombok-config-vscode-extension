@@ -56,9 +56,13 @@ export class LombokConfigCompletionProvider implements vscode.CompletionItemProv
     const leadingWhitespaceMatch = lineText.match(/^(\s*)/);
     const startChar = leadingWhitespaceMatch ? leadingWhitespaceMatch[1].length : 0;
 
-    // Detect if an assignment operator already exists ahead on the line
-    const operatorAheadMatch = textAfterCursor.match(/^([^\s=+\-]*)\s*(\+=|-=|=)/);
-    const hasOperatorAhead = /[=+\-]/.test(textAfterCursor);
+    // Strip trailing comment from textAfterCursor
+    const commentIdx = textAfterCursor.indexOf('#');
+    const codeAfterCursor = commentIdx !== -1 ? textAfterCursor.substring(0, commentIdx) : textAfterCursor;
+
+    // Detect if an assignment operator already exists ahead on the current statement
+    const operatorAheadMatch = codeAfterCursor.match(/^([a-zA-Z0-9_.-]*)\s*(\+=|-=|=)/);
+    const hasOperatorAhead = !!operatorAheadMatch;
 
     // Find the end of the key token on the line
     const wordAfterMatch = textAfterCursor.match(/^([a-zA-Z0-9_.-]*)/);

@@ -59,7 +59,7 @@
         },
         {
           "name": "constant.language.call-super.lombok",
-          "match": "\\b(call|skip)\\b"
+          "match": "\\b(call|ignore|warn)\\b"
         },
         {
           "name": "constant.language.access-level.lombok",

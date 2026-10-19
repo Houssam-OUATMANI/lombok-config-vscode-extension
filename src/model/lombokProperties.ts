@@ -65,7 +65,8 @@ export const LOMBOK_PROPERTIES: readonly LombokPropertyDef[] = [
       'androidx',
       'findbugs',
       'spring',
-      'checkerframework'
+      'checkerframework',
+      'jspecify'
     ],
     defaultValue: 'none',
     category: 'Nullability',
@@ -110,6 +111,25 @@ export const LOMBOK_PROPERTIES: readonly LombokPropertyDef[] = [
     defaultValue: 'false',
     category: 'Accessors',
     description: 'If `true`, generated getters will be declared `final`.'
+  },
+  {
+    key: 'lombok.getter.noIsPrefix',
+    type: 'boolean',
+    allowedValues: ['true', 'false'],
+    defaultValue: 'false',
+    category: 'Accessors',
+    description: 'If `true`, boolean getters will be named `getFoo()` instead of `isFoo()`.'
+  },
+  {
+    key: 'lombok.accessors.noIsPrefix',
+    type: 'boolean',
+    allowedValues: ['true', 'false'],
+    defaultValue: 'false',
+    category: 'Accessors',
+    deprecated: true,
+    deprecationMessage: 'Deprecated by Project Lombok. Use `lombok.getter.noIsPrefix` instead.',
+    replacement: 'lombok.getter.noIsPrefix = true',
+    description: 'Deprecated alias for `lombok.getter.noIsPrefix`.'
   },
 
   // --- Constructors ---
@@ -157,6 +177,14 @@ export const LOMBOK_PROPERTIES: readonly LombokPropertyDef[] = [
     defaultValue: 'warn',
     category: 'EqualsAndHashCode',
     description: 'Determines how `equals` and `hashCode` call the superclass method when extending a non-Object class: `call`, `ignore`, or `warn`.'
+  },
+  {
+    key: 'lombok.equalsAndHashCode.warnWhenNoExplicitlyIncluded',
+    type: 'boolean',
+    allowedValues: ['true', 'false'],
+    defaultValue: 'false',
+    category: 'EqualsAndHashCode',
+    description: 'If `true`, Lombok emits a warning when `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` is used without any explicit `@EqualsAndHashCode.Include` fields.'
   },
   {
     key: 'lombok.toString.doNotUseGetters',
@@ -309,6 +337,12 @@ export const LOMBOK_PROPERTIES: readonly LombokPropertyDef[] = [
     category: 'NonNull',
     description: 'Exception type thrown when a `@NonNull` parameter is null.'
   },
+  {
+    key: 'lombok.nonNull.customAnnotation',
+    type: 'string',
+    category: 'NonNull',
+    description: 'Custom annotation type to use when Lombok generates null-checks (e.g. `com.example.MyNonNull`).'
+  },
 
   // --- Copyable Annotations ---
   {
@@ -336,6 +370,14 @@ export const LOMBOK_PROPERTIES: readonly LombokPropertyDef[] = [
     defaultValue: 'false',
     category: 'Code Quality',
     description: 'When `true`, Lombok adds `@edu.umd.cs.findbugs.annotations.SuppressFBWarnings` to generated code.'
+  },
+  {
+    key: 'lombok.disableConfig',
+    type: 'boolean',
+    allowedValues: ['true', 'false'],
+    defaultValue: 'false',
+    category: 'Configuration',
+    description: 'If `true`, Lombok completely stops processing any configuration files in this directory or subdirectories.'
   }
 ];
 
@@ -378,7 +420,10 @@ const FLAG_USAGE_TARGETS = [
   'with',
   'builder',
   'superBuilder',
-  'utilityClass'
+  'utilityClass',
+  'anyConstructor',
+  'jacksonized',
+  'locked'
 ] as const;
 
 export const FLAG_USAGE_VALUES = ['warning', 'error', 'allow'] as const;

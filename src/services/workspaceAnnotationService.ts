@@ -229,6 +229,62 @@ const FRAMEWORK_ANNOTATIONS: readonly ResolvedAnnotation[] = [
     simpleName: 'Named',
     source: 'framework',
     description: 'MapStruct @Named: specifies qualifier method for bean mapping'
+  },
+
+  // JSpecify Nullability
+  {
+    fqcn: 'org.jspecify.annotations.NonNull',
+    simpleName: 'NonNull',
+    source: 'framework',
+    description: 'JSpecify @NonNull: marks type use as non-null'
+  },
+  {
+    fqcn: 'org.jspecify.annotations.Nullable',
+    simpleName: 'Nullable',
+    source: 'framework',
+    description: 'JSpecify @Nullable: marks type use as nullable'
+  },
+
+  // Micronaut
+  {
+    fqcn: 'io.micronaut.core.annotation.NonNull',
+    simpleName: 'NonNull',
+    source: 'framework',
+    description: 'Micronaut @NonNull: marks parameter or return value as non-null'
+  },
+  {
+    fqcn: 'io.micronaut.core.annotation.Nullable',
+    simpleName: 'Nullable',
+    source: 'framework',
+    description: 'Micronaut @Nullable: marks parameter or return value as nullable'
+  },
+
+  // Quarkus
+  {
+    fqcn: 'io.quarkus.runtime.annotations.RegisterForReflection',
+    simpleName: 'RegisterForReflection',
+    source: 'framework',
+    description: 'Quarkus @RegisterForReflection: registers classes for GraalVM native image reflection'
+  },
+
+  // Additional JPA
+  {
+    fqcn: 'jakarta.persistence.Enumerated',
+    simpleName: 'Enumerated',
+    source: 'framework',
+    description: 'JPA @Enumerated: specifies enum type mapping in database'
+  },
+  {
+    fqcn: 'jakarta.persistence.Version',
+    simpleName: 'Version',
+    source: 'framework',
+    description: 'JPA @Version: optimistic locking attribute'
+  },
+  {
+    fqcn: 'jakarta.persistence.Basic',
+    simpleName: 'Basic',
+    source: 'framework',
+    description: 'JPA @Basic: specifies basic persistent property'
   }
 ];
 
@@ -289,9 +345,11 @@ export class WorkspaceAnnotationService implements vscode.Disposable {
    */
   private initWatcher(): void {
     const watcher = vscode.workspace.createFileSystemWatcher('**/*.java');
+    const isExcluded = (filePath: string) =>
+      /[\\/](target|build|\.gradle|\.idea|bin|out|dist|node_modules)[\\/]/.test(filePath);
 
-    watcher.onDidCreate(uri => this.scanJavaFile(uri), this, this.disposables);
-    watcher.onDidChange(uri => this.scanJavaFile(uri), this, this.disposables);
+    watcher.onDidCreate(uri => { if (!isExcluded(uri.fsPath)) this.scanJavaFile(uri); }, this, this.disposables);
+    watcher.onDidChange(uri => { if (!isExcluded(uri.fsPath)) this.scanJavaFile(uri); }, this, this.disposables);
     watcher.onDidDelete(
       uri => {
         // Remove annotations from this file path if tracked
@@ -317,8 +375,9 @@ export class WorkspaceAnnotationService implements vscode.Disposable {
     this.isScanning = true;
 
     try {
-      // Find up to 500 Java files to index custom annotations and imports rapidly
-      const javaFiles = await vscode.workspace.findFiles('**/*.java', '**/node_modules/**', 500);
+      // Find up to 500 Java files to index custom annotations and imports rapidly, excluding build artifacts
+      const excludeGlob = '{**/node_modules/**,**/target/**,**/build/**,**/.gradle/**,**/.idea/**,**/bin/**,**/out/**,**/dist/**}';
+      const javaFiles = await vscode.workspace.findFiles('**/*.java', excludeGlob, 500);
 
       for (const fileUri of javaFiles) {
         await this.scanJavaFile(fileUri);
