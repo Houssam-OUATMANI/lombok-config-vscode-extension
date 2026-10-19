@@ -13,7 +13,10 @@ const mockVscode = {
     asRelativePath: (uri: { fsPath: string }) => uri.fsPath,
     fs: {
       readFile: async () => Buffer.from('')
-    }
+    },
+    getConfiguration: (_section = '') => ({
+      get: (_key: string, defaultValue?: any) => defaultValue
+    })
   },
   CompletionItem: class {
     label: string;
@@ -69,7 +72,80 @@ const mockVscode = {
       this.end = { line: endLine, character: endChar };
     }
   },
-  Hover: class {}
+  Hover: class {},
+  DocumentSymbol: class {
+    name: string;
+    detail: string;
+    kind: number;
+    range: any;
+    selectionRange: any;
+    children: any[] = [];
+    constructor(name: string, detail: string, kind: number, range: any, selectionRange: any) {
+      this.name = name;
+      this.detail = detail;
+      this.kind = kind;
+      this.range = range;
+      this.selectionRange = selectionRange;
+    }
+  },
+  SymbolKind: {
+    Namespace: 2,
+    Property: 6,
+    Boolean: 16,
+    Array: 17,
+    String: 14,
+    EnumMember: 21,
+    Event: 23
+  },
+  Diagnostic: class {
+    range: any;
+    message: string;
+    severity: number;
+    code?: string;
+    source?: string;
+    tags?: number[];
+    constructor(range: any, message: string, severity = 0) {
+      this.range = range;
+      this.message = message;
+      this.severity = severity;
+    }
+  },
+  DiagnosticSeverity: {
+    Error: 0,
+    Warning: 1,
+    Information: 2,
+    Hint: 3
+  },
+  DiagnosticTag: {
+    Unnecessary: 1,
+    Deprecated: 2
+  },
+  CodeAction: class {
+    title: string;
+    kind: any;
+    edit?: any;
+    diagnostics?: any[];
+    isPreferred?: boolean;
+    constructor(title: string, kind?: any) {
+      this.title = title;
+      this.kind = kind;
+    }
+  },
+  CodeActionKind: {
+    QuickFix: 'quickfix'
+  },
+  WorkspaceEdit: class {
+    operations: any[] = [];
+    replace(uri: any, range: any, newText: string) {
+      this.operations.push({ type: 'replace', uri, range, newText });
+    }
+    delete(uri: any, range: any) {
+      this.operations.push({ type: 'delete', uri, range });
+    }
+    insert(uri: any, position: any, newText: string) {
+      this.operations.push({ type: 'insert', uri, position, newText });
+    }
+  }
 };
 
 const originalRequire = Module.prototype.require;

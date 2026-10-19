@@ -4,6 +4,7 @@ import { LombokConfigHoverProvider } from './providers/hoverProvider';
 import { LombokConfigDiagnosticProvider } from './providers/diagnosticProvider';
 import { LombokConfigCodeActionProvider } from './providers/codeActionProvider';
 import { LombokConfigFormattingProvider } from './providers/formattingProvider';
+import { LombokConfigDocumentSymbolProvider } from './providers/symbolProvider';
 import { WorkspaceAnnotationService } from './services/workspaceAnnotationService';
 
 const LOMBOK_CONFIG_SELECTOR: vscode.DocumentSelector = [
@@ -99,6 +100,15 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.languages.registerDocumentFormattingEditProvider(
       LOMBOK_CONFIG_SELECTOR,
       formattingProvider
+    )
+  );
+
+  // 6. Document Symbol (Outline & Breadcrumbs) Provider
+  const symbolProvider = new LombokConfigDocumentSymbolProvider();
+  context.subscriptions.push(
+    vscode.languages.registerDocumentSymbolProvider(
+      LOMBOK_CONFIG_SELECTOR,
+      symbolProvider
     )
   );
 }

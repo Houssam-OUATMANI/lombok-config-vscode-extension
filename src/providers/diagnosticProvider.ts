@@ -9,7 +9,10 @@ export const DIAGNOSTIC_CODES = {
   INVALID_OPERATOR: 'lombok.invalid-operator',
   INVALID_VALUE: 'lombok.invalid-value',
   CLEAR_NON_LIST: 'lombok.clear-non-list',
-  SYNTAX_ERROR: 'lombok.syntax-error'
+  SYNTAX_ERROR: 'lombok.syntax-error',
+  DUPLICATE_KEY: 'lombok.duplicate-key',
+  INVALID_KEY_CASING: 'lombok.invalid-key-casing',
+  STOP_BUBBLING_ORDER: 'lombok.stop-bubbling-order'
 } as const;
 
 export interface LintConfig {
@@ -43,9 +46,34 @@ export class LombokConfigDiagnosticProvider {
     const parsed = parseConfigText(document.getText());
     const diagnostics: vscode.Diagnostic[] = [];
 
+    // Pre-pass: map scalar property assignments to detect duplicate overrides
+    const scalarOccurrences = new Map<string, PropertyNode[]>();
+    let seenNonStopBubblingProperty = false;
+    let stopBubblingOrderWrong = false;
+
     for (const node of parsed.nodes) {
       if (node.kind === 'property') {
-        this.validatePropertyNode(node, config, diagnostics);
+        const lower = node.key.toLowerCase();
+        const prop = findProperty(node.key);
+        if (prop && prop.type !== 'list') {
+          const list = scalarOccurrences.get(lower) ?? [];
+          list.push(node);
+          scalarOccurrences.set(lower, list);
+        }
+
+        if (lower === 'config.stopbubbling') {
+          if (seenNonStopBubblingProperty) {
+            stopBubblingOrderWrong = true;
+          }
+        } else {
+          seenNonStopBubblingProperty = true;
+        }
+      }
+    }
+
+    for (const node of parsed.nodes) {
+      if (node.kind === 'property') {
+        this.validatePropertyNode(node, config, diagnostics, scalarOccurrences, stopBubblingOrderWrong);
       } else if (node.kind === 'clear') {
         this.validateClearNode(node, config, diagnostics);
       } else if (node.kind === 'malformed') {
@@ -69,7 +97,9 @@ export class LombokConfigDiagnosticProvider {
   private validatePropertyNode(
     node: PropertyNode,
     config: LintConfig,
-    diagnostics: vscode.Diagnostic[]
+    diagnostics: vscode.Diagnostic[],
+    scalarOccurrences: Map<string, PropertyNode[]>,
+    stopBubblingOrderWrong: boolean
   ): void {
     const prop = findProperty(node.key);
     const keyRange = new vscode.Range(
@@ -96,7 +126,41 @@ export class LombokConfigDiagnosticProvider {
       return;
     }
 
-    // 2. Check for Deprecated Key
+    // 2. Check for Incorrect Key Casing
+    if (node.key !== prop.key) {
+      const msg = `Configuration key '${node.key}' should be lowercase '${prop.key}'.`;
+      const diag = new vscode.Diagnostic(keyRange, msg, vscode.DiagnosticSeverity.Warning);
+      diag.code = DIAGNOSTIC_CODES.INVALID_KEY_CASING;
+      diag.source = 'Lombok';
+      diagnostics.push(diag);
+    }
+
+    // 3. Check for Duplicate Overridden Scalar Keys
+    if (prop.type !== 'list') {
+      const occurrences = scalarOccurrences.get(node.key.toLowerCase());
+      if (occurrences && occurrences.length > 1) {
+        const lastOccurrence = occurrences[occurrences.length - 1];
+        if (node !== lastOccurrence) {
+          const msg = `Duplicate key '${node.key}'. This assignment is overridden by line ${lastOccurrence.line + 1}.`;
+          const diag = new vscode.Diagnostic(keyRange, msg, vscode.DiagnosticSeverity.Warning);
+          diag.code = DIAGNOSTIC_CODES.DUPLICATE_KEY;
+          diag.tags = [vscode.DiagnosticTag.Unnecessary];
+          diag.source = 'Lombok';
+          diagnostics.push(diag);
+        }
+      }
+    }
+
+    // 4. Check for config.stopBubbling placement order
+    if (node.key.toLowerCase() === 'config.stopbubbling' && stopBubblingOrderWrong) {
+      const msg = `'config.stopBubbling' should ideally be declared at the top of the configuration file.`;
+      const diag = new vscode.Diagnostic(keyRange, msg, vscode.DiagnosticSeverity.Information);
+      diag.code = DIAGNOSTIC_CODES.STOP_BUBBLING_ORDER;
+      diag.source = 'Lombok';
+      diagnostics.push(diag);
+    }
+
+    // 5. Check for Deprecated Key
     if (prop.deprecated && config.deprecatedKeys !== null) {
       const msg = `Deprecated configuration key '${node.key}'. ${prop.deprecationMessage ?? ''}`;
       const diag = new vscode.Diagnostic(keyRange, msg, config.deprecatedKeys);
