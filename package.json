@@ -57,6 +57,18 @@
         "path": "./syntaxes/lombok-config.tmLanguage.json"
       }
     ],
+    "commands": [
+      {
+        "command": "lombokSense.showEffectiveConfig",
+        "title": "Lombok: Show Effective Configuration",
+        "category": "Lombok Sense"
+      },
+      {
+        "command": "lombokSense.createRootConfig",
+        "title": "Lombok: Create Root lombok.config",
+        "category": "Lombok Sense"
+      }
+    ],
     "configuration": {
       "title": "Lombok Sense",
       "properties": {

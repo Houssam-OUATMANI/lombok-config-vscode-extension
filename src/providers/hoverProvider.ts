@@ -3,6 +3,42 @@ import { findProperty, LombokPropertyDef } from '../model/lombokProperties';
 import { parseConfigText, ConfigNode } from '../parser/configParser';
 import { WorkspaceAnnotationService } from '../services/workspaceAnnotationService';
 
+const PROPERTY_JAVA_EXAMPLES: Record<string, string> = {
+  'lombok.accessors.fluent': `// Generated methods without get/set prefixes:
+public String name() { return this.name; }
+public Person name(String name) { this.name = name; return this; }`,
+
+  'lombok.accessors.chain': `// Setters return 'this' for method chaining:
+public Person setName(String name) {
+    this.name = name;
+    return this;
+}`,
+
+  'lombok.accessors.prefix': `// Field: String m_name;
+// Accessor generator strips 'm_' prefix:
+public String getName() { return this.m_name; }`,
+
+  'lombok.getter.noIsPrefix': `// For boolean fields:
+public boolean getActive() { return this.active; } // instead of isActive()`,
+
+  'lombok.addLombokGeneratedAnnotation': `// Generated methods annotated for JaCoCo exclusion:
+@lombok.Generated
+public String getName() { return this.name; }`,
+
+  'lombok.builder.className': `// Custom builder pattern name:
+Person.PersonBuilder builder = Person.builder();`,
+
+  'lombok.fieldDefaults.defaultPrivate': `// Class field without explicit modifier defaults to private:
+private String email;`,
+
+  'lombok.log.fieldName': `// Logger field initialized with chosen name:
+private static final Logger log = LoggerFactory.getLogger(MyService.class);`,
+
+  'lombok.copyableAnnotations': `// Copies annotation to generated getter and constructor param:
+@JsonProperty("user_id")
+private Long userId;`
+};
+
 /**
  * Rich documentation hover provider for lombok.config files.
  * Provides comprehensive Quick Documentation for keys, values, operators, and directives.
@@ -102,8 +138,10 @@ export class LombokConfigHoverProvider implements vscode.HoverProvider {
       md.appendMarkdown(`- **Default**: \`${prop.defaultValue}\`\n`);
     }
 
-    if (prop.allowedValues && prop.allowedValues.length > 0) {
-      md.appendMarkdown(`- **Allowed Values**: ${prop.allowedValues.map(v => `\`${v}\``).join(', ')}\n`);
+    // Code example preview if available
+    const example = PROPERTY_JAVA_EXAMPLES[prop.key];
+    if (example) {
+      md.appendMarkdown(`\n**Java Code Example**:\n\`\`\`java\n${example}\n\`\`\`\n`);
     }
 
     return new vscode.Hover(md, vscodeRange);

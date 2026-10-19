@@ -72,7 +72,14 @@ const mockVscode = {
       this.end = { line: endLine, character: endChar };
     }
   },
-  Hover: class {},
+  Hover: class {
+    contents: any[];
+    range?: any;
+    constructor(contents: any, range?: any) {
+      this.contents = Array.isArray(contents) ? contents : [contents];
+      this.range = range;
+    }
+  },
   DocumentSymbol: class {
     name: string;
     detail: string;
@@ -145,6 +152,45 @@ const mockVscode = {
     insert(uri: any, position: any, newText: string) {
       this.operations.push({ type: 'insert', uri, position, newText });
     }
+  },
+  InlayHint: class {
+    position: any;
+    label: string;
+    kind?: number;
+    tooltip?: string;
+    constructor(position: any, label: string, kind?: number) {
+      this.position = position;
+      this.label = label;
+      this.kind = kind;
+    }
+  },
+  InlayHintKind: {
+    Type: 1,
+    Parameter: 2
+  },
+  Location: class {
+    uri: any;
+    range: any;
+    constructor(uri: any, rangeOrPosition: any) {
+      this.uri = uri;
+      this.range = rangeOrPosition;
+    }
+  },
+  Uri: {
+    file: (fsPath: string) => ({ fsPath, toString: () => fsPath, scheme: 'file' }),
+    joinPath: (base: any, ...segments: string[]) => ({
+      fsPath: `${base.fsPath}/${segments.join('/')}`,
+      toString: () => `${base.fsPath}/${segments.join('/')}`
+    })
+  },
+  commands: {
+    registerCommand: (_cmd: string, _callback: Function) => ({ dispose: () => {} })
+  },
+  window: {
+    showInformationMessage: async (_msg: string) => {},
+    showWarningMessage: async (_msg: string) => {},
+    showErrorMessage: async (_msg: string) => {},
+    showTextDocument: async (_doc: any, _options?: any) => ({})
   }
 };
 
