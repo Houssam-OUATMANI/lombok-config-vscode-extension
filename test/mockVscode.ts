@@ -4,6 +4,7 @@ const Module = require('node:module');
 const mockVscode = {
   workspace: {
     findFiles: async () => [],
+    onDidChangeConfiguration: () => ({ dispose: () => {} }),
     createFileSystemWatcher: () => ({
       onDidCreate: () => ({ dispose: () => {} }),
       onDidChange: () => ({ dispose: () => {} }),
@@ -187,6 +188,10 @@ const mockVscode = {
     registerCommand: (_cmd: string, _callback: Function) => ({ dispose: () => {} })
   },
   window: {
+    createOutputChannel: () => ({
+      appendLine: (_message: string) => {},
+      dispose: () => {}
+    }),
     showInformationMessage: async (_msg: string) => {},
     showWarningMessage: async (_msg: string) => {},
     showErrorMessage: async (_msg: string) => {},

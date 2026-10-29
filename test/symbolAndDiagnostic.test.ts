@@ -69,6 +69,20 @@ test('DiagnosticProvider detects duplicate overridden scalar keys', () => {
   assert.ok(dupDiag?.message.includes('overridden by line 3'));
 });
 
+test('DiagnosticProvider rejects empty property values', () => {
+  let publishedDiags: vscode.Diagnostic[] = [];
+  const mockCollection = {
+    set: (_uri: any, diags: vscode.Diagnostic[]) => { publishedDiags = diags; }
+  } as unknown as vscode.DiagnosticCollection;
+  const provider = new LombokConfigDiagnosticProvider(mockCollection);
+
+  provider.updateDiagnostics(createMockDoc('lombok.accessors.chain ='));
+
+  const invalidValue = publishedDiags.find(d => d.code === DIAGNOSTIC_CODES.INVALID_VALUE);
+  assert.ok(invalidValue, 'Should require a value after the assignment operator');
+  assert.ok(invalidValue?.message.includes('A value is required'));
+});
+
 test('DiagnosticProvider detects incorrect key casing and provides quick fix', () => {
   let publishedDiags: vscode.Diagnostic[] = [];
   const mockCollection = {

@@ -188,7 +188,7 @@ export class LombokConfigDiagnosticProvider {
     }
 
     // 4. Check for Invalid Value
-    if (config.invalidValues !== null && node.value.length > 0) {
+    if (config.invalidValues !== null) {
       const valRange = new vscode.Range(
         node.valueRange.line,
         node.valueRange.startChar,
@@ -196,7 +196,13 @@ export class LombokConfigDiagnosticProvider {
         node.valueRange.endChar
       );
 
-      if (prop.type === 'boolean') {
+      if (node.value.length === 0) {
+        const msg = `A value is required for '${prop.key}'.`;
+        const diag = new vscode.Diagnostic(valRange, msg, config.invalidValues);
+        diag.code = DIAGNOSTIC_CODES.INVALID_VALUE;
+        diag.source = 'Lombok';
+        diagnostics.push(diag);
+      } else if (prop.type === 'boolean') {
         const lowerVal = node.value.toLowerCase();
         if (lowerVal !== 'true' && lowerVal !== 'false') {
           const msg = `Invalid boolean value '${node.value}' for '${prop.key}'. Expected 'true' or 'false'.`;

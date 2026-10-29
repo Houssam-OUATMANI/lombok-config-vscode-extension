@@ -49,6 +49,8 @@ Language support for Project Lombok configuration files (`lombok.config`) in Vis
 | `lombokSense.lint.deprecatedKeys` | `string` | `"warning"` | Severity for deprecated configuration keys. |
 | `lombokSense.lint.invalidValues` | `string` | `"error"` | Severity for invalid or unallowed property values. |
 | `lombokSense.lint.invalidOperators` | `string` | `"error"` | Severity when using `+=` or `-=` on scalar properties. |
+| `lombokSense.annotations.indexing.enabled` | `boolean` | `true` | Enables workspace Java annotation indexing for completions. |
+| `lombokSense.annotations.indexing.maxFiles` | `integer` | `500` | Maximum number of Java files scanned for workspace annotations. |
 | `lombokSense.format.spaceAroundOperator` | `boolean` | `true` | Enforces a single space around operators (`=`, `+=`, `-=`). |
 
 ## Supported Properties

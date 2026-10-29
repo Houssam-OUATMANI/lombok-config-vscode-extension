@@ -1,6 +1,7 @@
 import './mockVscode';
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { mockVscode } from './mockVscode';
 import { WorkspaceAnnotationService } from '../src/services/workspaceAnnotationService';
 
 test('provides default framework annotations including Spring @Qualifier', () => {
@@ -44,4 +45,34 @@ test('filters annotations by prefix or simple name', () => {
     qualifierMatches[0].fqcn,
     'org.springframework.beans.factory.annotation.Qualifier'
   );
+});
+
+test('refreshes annotations when a workspace Java file changes', async () => {
+  const file = mockVscode.Uri.file('d:/project/src/CustomAnnotations.java');
+  let source = 'package example;\n@interface FirstAnnotation {}\n// @interface CommentedAnnotation {}';
+  const previousFindFiles = mockVscode.workspace.findFiles;
+  const previousReadFile = mockVscode.workspace.fs.readFile;
+  mockVscode.workspace.findFiles = async () => [file];
+  mockVscode.workspace.fs.readFile = async () => Buffer.from(source);
+
+  const service = new WorkspaceAnnotationService();
+  try {
+    await service.scanWorkspace();
+    assert.ok(service.getAnnotations().some(annotation => annotation.fqcn === 'example.FirstAnnotation'));
+    assert.ok(!service.getAnnotations().some(annotation => annotation.fqcn === 'example.CommentedAnnotation'));
+
+    source = 'package example;\n@interface SecondAnnotation {}';
+    await service.scanWorkspace();
+    const workspaceAnnotations = service.getAnnotations().filter(annotation => annotation.source === 'workspace');
+    assert.ok(workspaceAnnotations.some(annotation => annotation.fqcn === 'example.SecondAnnotation'));
+    assert.ok(!workspaceAnnotations.some(annotation => annotation.fqcn === 'example.FirstAnnotation'));
+
+    source = 'package example;\nimport example.Commented;\n// @Commented\nclass Example { String text = "@Commented"; }';
+    await service.scanWorkspace();
+    assert.ok(!service.getAnnotations().some(annotation => annotation.fqcn === 'example.Commented'));
+  } finally {
+    service.dispose();
+    mockVscode.workspace.findFiles = previousFindFiles;
+    mockVscode.workspace.fs.readFile = previousReadFile;
+  }
 });

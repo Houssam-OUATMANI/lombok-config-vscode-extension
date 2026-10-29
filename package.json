@@ -112,6 +112,18 @@
           "default": "error",
           "description": "Severity level when using '+=' or '-=' on non-list properties."
         },
+        "lombokSense.annotations.indexing.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Index Java files in the workspace to discover custom annotations for completion."
+        },
+        "lombokSense.annotations.indexing.maxFiles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000,
+          "default": 500,
+          "description": "Maximum number of Java files to scan for workspace annotations."
+        },
         "lombokSense.format.spaceAroundOperator": {
           "type": "boolean",
           "default": true,

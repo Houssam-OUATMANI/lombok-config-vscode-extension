@@ -170,6 +170,22 @@ export function activate(context: vscode.ExtensionContext): void {
       const rootFolder = workspaceFolders[0].uri;
       const targetFile = vscode.Uri.joinPath(rootFolder, 'lombok.config');
 
+      const existingFiles = await vscode.workspace.findFiles(
+        new vscode.RelativePattern(rootFolder, 'lombok.config'),
+        undefined,
+        1
+      );
+      if (existingFiles.length > 0) {
+        const overwrite = await vscode.window.showWarningMessage(
+          'A lombok.config already exists at the workspace root. Do you want to overwrite it?',
+          { modal: true },
+          'Overwrite'
+        );
+        if (overwrite !== 'Overwrite') {
+          return;
+        }
+      }
+
       const template = [
         '# ============================================================================== #',
         '# Root Project Lombok Configuration                                             #',
