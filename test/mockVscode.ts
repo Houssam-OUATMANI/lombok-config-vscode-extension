@@ -3,20 +3,37 @@ const Module = require('node:module');
 
 const mockVscode = {
   workspace: {
-    findFiles: async () => [],
+    findFiles: async (_include?: string, _exclude?: string, _maxResults?: number, _token?: any): Promise<any[]> => [],
     onDidChangeConfiguration: () => ({ dispose: () => {} }),
+    workspaceFolders: undefined as { uri: { fsPath: string } }[] | undefined,
+    configurationValues: {} as Record<string, unknown>,
+    watcherListeners: {
+      create: [] as ((uri: any) => void)[],
+      change: [] as ((uri: any) => void)[],
+      delete: [] as ((uri: any) => void)[]
+    },
     createFileSystemWatcher: () => ({
-      onDidCreate: () => ({ dispose: () => {} }),
-      onDidChange: () => ({ dispose: () => {} }),
-      onDidDelete: () => ({ dispose: () => {} }),
+      onDidCreate: (listener: (uri: any) => void) => {
+        mockVscode.workspace.watcherListeners.create.push(listener);
+        return { dispose: () => {} };
+      },
+      onDidChange: (listener: (uri: any) => void) => {
+        mockVscode.workspace.watcherListeners.change.push(listener);
+        return { dispose: () => {} };
+      },
+      onDidDelete: (listener: (uri: any) => void) => {
+        mockVscode.workspace.watcherListeners.delete.push(listener);
+        return { dispose: () => {} };
+      },
       dispose: () => {}
     }),
     asRelativePath: (uri: { fsPath: string }) => uri.fsPath,
     fs: {
       readFile: async () => Buffer.from('')
     },
-    getConfiguration: (_section = '') => ({
-      get: (_key: string, defaultValue?: any) => defaultValue
+    getConfiguration: (section = '') => ({
+      get: (key: string, defaultValue?: any) =>
+        mockVscode.workspace.configurationValues[`${section}.${key}`] ?? defaultValue
     })
   },
   CompletionItem: class {
@@ -198,6 +215,28 @@ const mockVscode = {
     showTextDocument: async (_doc: any, _options?: any) => ({})
   }
 };
+
+class MockCancellationTokenSource {
+  private cancelled = false;
+  readonly token: { readonly isCancellationRequested: boolean };
+
+  constructor() {
+    const source = this;
+    this.token = {
+      get isCancellationRequested() {
+        return source.cancelled;
+      }
+    };
+  }
+
+  cancel() {
+    this.cancelled = true;
+  }
+
+  dispose() {}
+}
+
+Object.assign(mockVscode, { CancellationTokenSource: MockCancellationTokenSource });
 
 const originalRequire = Module.prototype.require;
 Module.prototype.require = function (path: string, ...args: any[]) {

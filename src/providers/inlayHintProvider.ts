@@ -46,7 +46,11 @@ export class LombokConfigInlayHintProvider implements vscode.InlayHintsProvider 
           const ann = this.annotationService.getAnnotations().find(a => a.fqcn === node.value.trim());
           if (ann) {
             const valEndPos = new vscode.Position(node.valueRange.line, node.valueRange.endChar);
-            const sourceBadge = ann.source === 'workspace' ? ' [Workspace]' : ` [${ann.simpleName}]`;
+            const sourceBadge = ann.source === 'workspace'
+              ? ' [Workspace]'
+              : ann.source === 'dependency'
+                ? ' [Dependency]'
+                : ` [${ann.simpleName}]`;
             const badgeHint = new vscode.InlayHint(
               valEndPos,
               sourceBadge,

@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 export interface ResolvedAnnotation {
   readonly fqcn: string; // Fully qualified class name, e.g. org.springframework.beans.factory.annotation.Qualifier
   readonly simpleName: string; // e.g. Qualifier
-  readonly source: 'workspace' | 'framework';
+  readonly source: 'workspace' | 'dependency' | 'framework';
   readonly description?: string;
 }
 
@@ -298,8 +298,8 @@ export class WorkspaceAnnotationService implements vscode.Disposable {
   private readonly fileScanGenerations = new Map<string, number>();
   private readonly disposables: vscode.Disposable[] = [];
   private readonly outputChannel = vscode.window.createOutputChannel('Lombok Sense');
+  private scanCancellation: vscode.CancellationTokenSource | undefined;
   private scanPromise: Promise<void> | undefined;
-  private scanRequested = false;
 
   constructor() {
     this.disposables.push(
@@ -318,6 +318,9 @@ export class WorkspaceAnnotationService implements vscode.Disposable {
       d.dispose();
     }
     this.disposables.length = 0;
+    this.scanCancellation?.cancel();
+    this.scanCancellation?.dispose();
+    this.scanCancellation = undefined;
     this.outputChannel.dispose();
     this.workspaceAnnotations.clear();
     this.annotationsByFile.clear();
@@ -337,7 +340,9 @@ export class WorkspaceAnnotationService implements vscode.Disposable {
 
     // 2. Add dynamically discovered workspace annotations
     for (const [fqcn, ann] of this.workspaceAnnotations) {
-      results.set(fqcn, ann);
+      if (!results.has(fqcn)) {
+        results.set(fqcn, ann);
+      }
     }
 
     const all = Array.from(results.values());
@@ -359,13 +364,13 @@ export class WorkspaceAnnotationService implements vscode.Disposable {
    */
   private initWatcher(): void {
     const watcher = vscode.workspace.createFileSystemWatcher('**/*.java');
-    const isExcluded = (filePath: string) =>
-      /[\\/](target|build|\.gradle|\.idea|bin|out|dist|node_modules)[\\/]/.test(filePath);
-
-    watcher.onDidCreate(uri => { if (!isExcluded(uri.fsPath)) void this.scanJavaFile(uri); }, this, this.disposables);
-    watcher.onDidChange(uri => { if (!isExcluded(uri.fsPath)) void this.scanJavaFile(uri); }, this, this.disposables);
+    watcher.onDidCreate(uri => { if (!this.isExcluded(uri)) void this.scanJavaFile(uri); }, this, this.disposables);
+    watcher.onDidChange(uri => { if (!this.isExcluded(uri)) void this.scanJavaFile(uri); }, this, this.disposables);
     watcher.onDidDelete(
       uri => {
+        if (this.isExcluded(uri)) {
+          return;
+        }
         const key = uri.toString();
         this.fileScanGenerations.set(key, (this.fileScanGenerations.get(key) ?? 0) + 1);
         this.annotationsByFile.delete(key);
@@ -382,66 +387,86 @@ export class WorkspaceAnnotationService implements vscode.Disposable {
    * Scans all .java files across workspace folders to discover annotation definitions and imports.
    */
   public scanWorkspace(): Promise<void> {
-    if (this.scanPromise) {
-      this.scanRequested = true;
-      return this.scanPromise;
-    }
-    this.scanPromise = this.runWorkspaceScan().finally(() => {
-      this.scanPromise = undefined;
+    this.scanCancellation?.cancel();
+    this.scanCancellation?.dispose();
+    const cancellation = new vscode.CancellationTokenSource();
+    this.scanCancellation = cancellation;
+
+    const scanPromise = this.runWorkspaceScan(cancellation.token).finally(() => {
+      cancellation.dispose();
+      if (this.scanCancellation === cancellation) {
+        this.scanCancellation = undefined;
+        this.scanPromise = undefined;
+      }
     });
-    return this.scanPromise;
+    this.scanPromise = scanPromise;
+    return scanPromise;
   }
 
-  private async runWorkspaceScan(): Promise<void> {
+  private async runWorkspaceScan(token: vscode.CancellationToken): Promise<void> {
     try {
-      do {
-        this.scanRequested = false;
-        const config = vscode.workspace.getConfiguration('lombokSense.annotations.indexing');
-        if (!config.get<boolean>('enabled', true)) {
+      const config = vscode.workspace.getConfiguration('lombokSense.annotations.indexing');
+      if (!config.get<boolean>('enabled', true)) {
+        if (!token.isCancellationRequested) {
           this.annotationsByFile.clear();
           this.workspaceAnnotations.clear();
-          continue;
         }
+        return;
+      }
 
-        const configuredLimit = config.get<number>('maxFiles', 500);
-        const maxFiles = Number.isFinite(configuredLimit) ? Math.max(1, Math.floor(configuredLimit)) : 500;
-        const excludeGlob = '{**/node_modules/**,**/target/**,**/build/**,**/.gradle/**,**/.idea/**,**/bin/**,**/out/**,**/dist/**}';
-        const javaFiles = await vscode.workspace.findFiles('**/*.java', excludeGlob, maxFiles + 1);
-        const selectedFiles = javaFiles.slice(0, maxFiles);
-        const selectedKeys = new Set(selectedFiles.map(file => file.toString()));
+      const configuredLimit = config.get<number>('maxFiles', 500);
+      const maxFiles = Number.isFinite(configuredLimit)
+        ? Math.min(10000, Math.max(1, Math.floor(configuredLimit)))
+        : 500;
+      const excludePatterns = this.getExcludePatterns(config);
+      const javaFiles = await vscode.workspace.findFiles(
+        '**/*.java',
+        `{${excludePatterns.join(',')}}`,
+        maxFiles + 1,
+        token
+      );
+      if (token.isCancellationRequested) {
+        return;
+      }
 
-        if (javaFiles.length <= maxFiles) {
-          for (const key of this.annotationsByFile.keys()) {
-            if (!selectedKeys.has(key)) {
-              this.annotationsByFile.delete(key);
-            }
+      const selectedFiles = javaFiles.slice(0, maxFiles);
+      const selectedKeys = new Set(selectedFiles.map(file => file.toString()));
+      if (javaFiles.length <= maxFiles) {
+        for (const key of this.annotationsByFile.keys()) {
+          if (!selectedKeys.has(key)) {
+            this.annotationsByFile.delete(key);
           }
-          this.rebuildWorkspaceAnnotations();
-        } else {
-          this.outputChannel.appendLine(
-            `Annotation indexing is limited to ${maxFiles} Java files. Increase lombokSense.annotations.indexing.maxFiles to index more.`
-          );
         }
+        this.rebuildWorkspaceAnnotations();
+      } else {
+        this.outputChannel.appendLine(
+          `Annotation indexing is limited to ${maxFiles} Java files. Increase lombokSense.annotations.indexing.maxFiles to index more.`
+        );
+      }
 
-        for (let i = 0; i < selectedFiles.length; i += 12) {
-          await Promise.all(selectedFiles.slice(i, i + 12).map(file => this.scanJavaFile(file)));
-        }
-      } while (this.scanRequested);
+      for (let i = 0; i < selectedFiles.length && !token.isCancellationRequested; i += 12) {
+        await Promise.all(selectedFiles.slice(i, i + 12).map(file => this.scanJavaFile(file, token)));
+      }
     } catch (error) {
-      this.outputChannel.appendLine(`Failed to index workspace annotations: ${this.errorMessage(error)}`);
+      if (!token.isCancellationRequested) {
+        this.outputChannel.appendLine(`Failed to index workspace annotations: ${this.errorMessage(error)}`);
+      }
     }
   }
 
   /**
    * Inspects a single .java file for package, @interface definitions, and annotation imports.
    */
-  private async scanJavaFile(uri: vscode.Uri): Promise<void> {
+  private async scanJavaFile(uri: vscode.Uri, token?: vscode.CancellationToken): Promise<void> {
     const key = uri.toString();
     const generation = (this.fileScanGenerations.get(key) ?? 0) + 1;
     this.fileScanGenerations.set(key, generation);
 
     try {
       const fileBytes = await vscode.workspace.fs.readFile(uri);
+      if (token?.isCancellationRequested) {
+        return;
+      }
       const text = Buffer.from(fileBytes).toString('utf-8');
       const sourceCode = this.stripCommentsAndLiterals(text);
       const discovered = new Map<string, ResolvedAnnotation>();
@@ -476,12 +501,12 @@ export class WorkspaceAnnotationService implements vscode.Disposable {
           discovered.set(fullImport, {
             fqcn: fullImport,
             simpleName,
-            source: 'workspace',
-            description: `Annotation imported & used in workspace (${vscode.workspace.asRelativePath(uri)})`
+            source: 'dependency',
+            description: `Annotation imported and used in ${vscode.workspace.asRelativePath(uri)}. The import may resolve from a project dependency.`
           });
         }
       }
-      if (this.fileScanGenerations.get(key) === generation) {
+      if (!token?.isCancellationRequested && this.fileScanGenerations.get(key) === generation) {
         this.annotationsByFile.set(key, discovered);
         this.rebuildWorkspaceAnnotations();
       }
@@ -494,9 +519,76 @@ export class WorkspaceAnnotationService implements vscode.Disposable {
     this.workspaceAnnotations.clear();
     for (const annotations of this.annotationsByFile.values()) {
       for (const [fqcn, annotation] of annotations) {
-        this.workspaceAnnotations.set(fqcn, annotation);
+        const existing = this.workspaceAnnotations.get(fqcn);
+        if (!existing || (annotation.source === 'workspace' && existing.source !== 'workspace')) {
+          this.workspaceAnnotations.set(fqcn, annotation);
+        }
       }
     }
+  }
+
+  private getExcludePatterns(config: vscode.WorkspaceConfiguration): string[] {
+    const defaults = [
+      '**/node_modules/**',
+      '**/target/**',
+      '**/build/**',
+      '**/.gradle/**',
+      '**/.idea/**',
+      '**/bin/**',
+      '**/out/**',
+      '**/dist/**'
+    ];
+    const configured = config.get<unknown[]>('exclude', []);
+    const custom = Array.isArray(configured)
+      ? configured.filter((pattern): pattern is string => typeof pattern === 'string' && pattern.trim().length > 0)
+      : [];
+    return [...new Set([...defaults, ...custom.map(pattern => pattern.trim())])];
+  }
+
+  private isExcluded(uri: vscode.Uri): boolean {
+    const config = vscode.workspace.getConfiguration('lombokSense.annotations.indexing');
+    const patterns = this.getExcludePatterns(config);
+    const normalizedPath = uri.fsPath.replace(/\\/g, '/');
+    const workspaceFolders = vscode.workspace.workspaceFolders ?? [];
+    return workspaceFolders.some(folder => {
+      const root = folder.uri.fsPath.replace(/\\/g, '/').replace(/\/+$/, '');
+      const relativePath = normalizedPath.startsWith(`${root}/`)
+        ? normalizedPath.slice(root.length + 1)
+        : normalizedPath;
+      return patterns.some(pattern => this.matchesGlob(relativePath, pattern));
+    });
+  }
+
+  private matchesGlob(path: string, glob: string): boolean {
+    let regex = '^';
+    let braceDepth = 0;
+    for (let index = 0; index < glob.length; index++) {
+      const character = glob[index];
+      if (character === '*' && glob[index + 1] === '*') {
+        index++;
+        if (glob[index + 1] === '/') {
+          index++;
+          regex += '(?:.*/)?';
+        } else {
+          regex += '.*';
+        }
+      } else if (character === '*') {
+        regex += '[^/]*';
+      } else if (character === '?') {
+        regex += '[^/]';
+      } else if (character === '{') {
+        braceDepth++;
+        regex += '(?:';
+      } else if (character === '}' && braceDepth > 0) {
+        braceDepth--;
+        regex += ')';
+      } else if (character === ',' && braceDepth > 0) {
+        regex += '|';
+      } else {
+        regex += character.replace(/[.+^${}()|[\]\\]/g, '\\$&');
+      }
+    }
+    return new RegExp(`${regex}$`).test(path);
   }
 
   private stripCommentsAndLiterals(text: string): string {

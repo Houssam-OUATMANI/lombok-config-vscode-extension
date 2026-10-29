@@ -76,3 +76,117 @@ test('refreshes annotations when a workspace Java file changes', async () => {
     mockVscode.workspace.fs.readFile = previousReadFile;
   }
 });
+
+test('indexes imported dependency annotations and accepts custom exclude globs', async () => {
+  const file = mockVscode.Uri.file('d:/project/src/Example.java');
+  const source = [
+    'package example;',
+    'import com.acme.annotations.Audited;',
+    'import org.springframework.beans.factory.annotation.Qualifier;',
+    '@Audited class Example { @Qualifier String value; }'
+  ].join('\n');
+  const previousFindFiles = mockVscode.workspace.findFiles;
+  const previousReadFile = mockVscode.workspace.fs.readFile;
+  const previousConfig = mockVscode.workspace.configurationValues;
+  let excludeGlob = '';
+  mockVscode.workspace.configurationValues = {
+    'lombokSense.annotations.indexing.exclude': ['**/generated/**']
+  };
+  mockVscode.workspace.findFiles = async (_include, exclude) => {
+    excludeGlob = exclude ?? '';
+    return [file];
+  };
+  mockVscode.workspace.fs.readFile = async () => Buffer.from(source);
+
+  const service = new WorkspaceAnnotationService();
+  try {
+    await service.scanWorkspace();
+    const audited = service.getAnnotations().find(annotation => annotation.fqcn === 'com.acme.annotations.Audited');
+    assert.ok(audited);
+    assert.equal(audited?.source, 'dependency');
+
+    const qualifier = service.getAnnotations().find(
+      annotation => annotation.fqcn === 'org.springframework.beans.factory.annotation.Qualifier'
+    );
+    assert.equal(qualifier?.source, 'framework');
+    assert.ok(excludeGlob.includes('**/generated/**'));
+  } finally {
+    service.dispose();
+    mockVscode.workspace.findFiles = previousFindFiles;
+    mockVscode.workspace.fs.readFile = previousReadFile;
+    mockVscode.workspace.configurationValues = previousConfig;
+  }
+});
+
+test('cancels a superseded workspace scan', async () => {
+  const file = mockVscode.Uri.file('d:/project/src/Latest.java');
+  const previousFindFiles = mockVscode.workspace.findFiles;
+  const previousReadFile = mockVscode.workspace.fs.readFile;
+  let firstToken: { isCancellationRequested: boolean } | undefined;
+  let finishFirstScan: ((files: any[]) => void) | undefined;
+  let calls = 0;
+
+  mockVscode.workspace.findFiles = async (_include, _exclude, _maxResults, token) => {
+    calls++;
+    if (calls === 1) {
+      firstToken = token;
+      return new Promise(resolve => {
+        finishFirstScan = resolve;
+      });
+    }
+    return [file];
+  };
+  mockVscode.workspace.fs.readFile = async () => Buffer.from('package example;\n@interface LatestAnnotation {}');
+
+  const service = new WorkspaceAnnotationService();
+  try {
+    await service.scanWorkspace();
+    assert.equal(firstToken?.isCancellationRequested, true);
+    assert.ok(service.getAnnotations().some(annotation => annotation.fqcn === 'example.LatestAnnotation'));
+    finishFirstScan?.([]);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.ok(service.getAnnotations().some(annotation => annotation.fqcn === 'example.LatestAnnotation'));
+  } finally {
+    finishFirstScan?.([]);
+    service.dispose();
+    mockVscode.workspace.findFiles = previousFindFiles;
+    mockVscode.workspace.fs.readFile = previousReadFile;
+  }
+});
+
+test('does not index Java files excluded by custom watcher globs', async () => {
+  const previousFindFiles = mockVscode.workspace.findFiles;
+  const previousReadFile = mockVscode.workspace.fs.readFile;
+  const previousFolders = mockVscode.workspace.workspaceFolders;
+  const previousConfig = mockVscode.workspace.configurationValues;
+  let reads = 0;
+  mockVscode.workspace.watcherListeners.create.length = 0;
+  mockVscode.workspace.workspaceFolders = [{ uri: { fsPath: 'd:/project' } }];
+  mockVscode.workspace.configurationValues = {
+    'lombokSense.annotations.indexing.exclude': ['**/{generated,build}/**']
+  };
+  mockVscode.workspace.findFiles = async () => [];
+  mockVscode.workspace.fs.readFile = async () => {
+    reads++;
+    return Buffer.from('package example;\n@interface Included {}');
+  };
+
+  const service = new WorkspaceAnnotationService();
+  try {
+    await service.scanWorkspace();
+    const onCreate = mockVscode.workspace.watcherListeners.create.at(-1);
+    onCreate?.(mockVscode.Uri.file('d:/project/src/generated/Excluded.java'));
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(reads, 0);
+
+    onCreate?.(mockVscode.Uri.file('d:/project/src/main/Included.java'));
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(reads, 1);
+  } finally {
+    service.dispose();
+    mockVscode.workspace.findFiles = previousFindFiles;
+    mockVscode.workspace.fs.readFile = previousReadFile;
+    mockVscode.workspace.workspaceFolders = previousFolders;
+    mockVscode.workspace.configurationValues = previousConfig;
+  }
+});

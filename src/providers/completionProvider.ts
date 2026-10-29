@@ -205,7 +205,12 @@ export class LombokConfigCompletionProvider implements vscode.CompletionItemProv
         for (let idx = 0; idx < annotations.length; idx++) {
           const ann = annotations[idx];
           const item = new vscode.CompletionItem(ann.fqcn, vscode.CompletionItemKind.Class);
-          item.detail = `@${ann.simpleName} (${ann.source === 'workspace' ? 'Workspace' : 'Framework'})`;
+          const sourceLabel = ann.source === 'workspace'
+            ? 'Workspace'
+            : ann.source === 'dependency'
+              ? 'Dependency import'
+              : 'Framework';
+          item.detail = `@${ann.simpleName} (${sourceLabel})`;
 
           const docs = new vscode.MarkdownString();
           docs.appendMarkdown(`### \`@${ann.simpleName}\`\n\n`);

@@ -124,6 +124,14 @@
           "default": 500,
           "description": "Maximum number of Java files to scan for workspace annotations."
         },
+        "lombokSense.annotations.indexing.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Additional workspace-relative glob patterns to exclude from Java annotation indexing."
+        },
         "lombokSense.format.spaceAroundOperator": {
           "type": "boolean",
           "default": true,
@@ -138,6 +146,7 @@
     "build": "npm run generate-schema && esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap",
     "build-prod": "npm run generate-schema && esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify",
     "watch": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --watch --sourcemap",
+    "typecheck": "tsc --noEmit",
     "test": "node --test dist-test/test/**/*.test.js",
     "build-test": "esbuild test/**/*.test.ts --outdir=dist-test/test --format=cjs --platform=node --bundle --external:vscode"
   },

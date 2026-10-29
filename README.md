@@ -23,7 +23,7 @@ Language support for Project Lombok configuration files (`lombok.config`) in Vis
 - **Smart Autocompletion**:
   - **Keys**: Full coverage of Lombok configuration properties (Lombok 1.18.36+) and `.flagUsage` targets (`@Locked`, `@Jacksonized`, etc.).
   - **Values**: Contextual completion for booleans, strategy enums (`callSuper`, `flagUsage`), loggers, and nullability providers (`jspecify`).
-  - **Live Workspace Annotation Resolution**: Automatically indexes workspace `@interface` definitions and framework libraries (Spring, Jackson, Jakarta, JPA, Micronaut, Quarkus, Swagger, JSpecify) for `lombok.copyableAnnotations`.
+  - **Live Annotation Resolution**: Indexes workspace `@interface` declarations and annotation imports used in Java source, alongside built-in framework suggestions (Spring, Jackson, Jakarta, JPA, Micronaut, Quarkus, Swagger, JSpecify). Imported FQCNs are inferred from Java imports; dependency artifacts are not scanned directly.
   - **Directives**: Suggests clearable list properties when typing `clear`.
 - **Diagnostics & Linting**:
   - Unknown keys detection with Levenshtein-based typo suggestions.
@@ -51,6 +51,7 @@ Language support for Project Lombok configuration files (`lombok.config`) in Vis
 | `lombokSense.lint.invalidOperators` | `string` | `"error"` | Severity when using `+=` or `-=` on scalar properties. |
 | `lombokSense.annotations.indexing.enabled` | `boolean` | `true` | Enables workspace Java annotation indexing for completions. |
 | `lombokSense.annotations.indexing.maxFiles` | `integer` | `500` | Maximum number of Java files scanned for workspace annotations. |
+| `lombokSense.annotations.indexing.exclude` | `string[]` | `[]` | Additional workspace-relative glob patterns to exclude, such as `**/generated/**`. |
 | `lombokSense.format.spaceAroundOperator` | `boolean` | `true` | Enforces a single space around operators (`=`, `+=`, `-=`). |
 
 ## Supported Properties

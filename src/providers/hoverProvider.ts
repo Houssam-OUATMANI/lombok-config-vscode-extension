@@ -239,7 +239,12 @@ export class LombokConfigHoverProvider implements vscode.HoverProvider {
       const match = this.annotationService.getAnnotations().find(a => a.fqcn === value);
       if (match) {
         md.appendMarkdown(`### Annotation: \`@${match.simpleName}\`\n\n`);
-        md.appendMarkdown(`**Source**: ${match.source === 'workspace' ? 'Workspace' : 'Framework Library'}\n\n`);
+        const sourceLabel = match.source === 'workspace'
+          ? 'Workspace'
+          : match.source === 'dependency'
+            ? 'Imported dependency (inferred from Java source)'
+            : 'Framework Library';
+        md.appendMarkdown(`**Source**: ${sourceLabel}\n\n`);
         md.appendMarkdown(`**Class**: \`${match.fqcn}\`\n\n`);
         if (match.description) {
           md.appendMarkdown(`${match.description}\n\n`);
