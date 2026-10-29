@@ -446,6 +446,83 @@ export const ALL_LOMBOK_PROPERTIES: readonly LombokPropertyDef[] = [
   ...FLAG_USAGE_PROPERTIES
 ];
 
+export interface LombokPropertiesJsonSchema {
+  readonly $schema: string;
+  readonly $id: string;
+  readonly title: string;
+  readonly description: string;
+  readonly type: 'object';
+  readonly properties: Readonly<Record<string, {
+    readonly title: string;
+    readonly description: string;
+    readonly type: 'boolean' | 'string' | 'array';
+    readonly enum?: readonly (string | boolean)[];
+    readonly items?: { readonly type: 'string' };
+    readonly default?: boolean | string;
+    readonly deprecated?: true;
+    readonly 'x-lombok-type': PropertyType;
+    readonly 'x-lombok-category': string;
+    readonly 'x-lombok-deprecation-message'?: string;
+    readonly 'x-lombok-replacement'?: string;
+  }>>;
+  readonly additionalProperties: false;
+}
+
+/**
+ * Creates a JSON representation schema from the same definitions used by editor features.
+ * The schema describes config values represented as a JSON object; lombok.config itself
+ * is a line-based format and cannot be validated directly by VS Code's JSON support.
+ */
+export function createLombokPropertiesJsonSchema(): LombokPropertiesJsonSchema {
+  const properties: Record<string, LombokPropertiesJsonSchema['properties'][string]> = {};
+
+  for (const property of ALL_LOMBOK_PROPERTIES) {
+    const schemaType = property.type === 'boolean'
+      ? 'boolean'
+      : property.type === 'list'
+        ? 'array'
+        : 'string';
+    const definition: LombokPropertiesJsonSchema['properties'][string] = {
+      title: property.key,
+      description: property.description,
+      type: schemaType,
+      ...(property.allowedValues
+        ? {
+            enum: property.type === 'boolean'
+              ? property.allowedValues.map(value => value === 'true')
+              : property.allowedValues
+          }
+        : {}),
+      ...(property.type === 'list' ? { items: { type: 'string' as const } } : {}),
+      ...(property.defaultValue !== undefined
+        ? {
+            default: property.type === 'boolean'
+              ? property.defaultValue === 'true'
+              : property.defaultValue
+          }
+        : {}),
+      ...(property.deprecated ? { deprecated: true as const } : {}),
+      'x-lombok-type': property.type,
+      'x-lombok-category': property.category,
+      ...(property.deprecationMessage
+        ? { 'x-lombok-deprecation-message': property.deprecationMessage }
+        : {}),
+      ...(property.replacement ? { 'x-lombok-replacement': property.replacement } : {})
+    };
+    properties[property.key] = definition;
+  }
+
+  return {
+    $schema: 'https://json-schema.org/draft/2020-12/schema',
+    $id: 'https://raw.githubusercontent.com/Houssam-OUATMANI/lombok-config-vscode-extension/main/schemas/lombok-config.schema.json',
+    title: 'Lombok configuration properties',
+    description: 'JSON representation of known Lombok configuration properties. This schema does not validate the line-based lombok.config file format.',
+    type: 'object',
+    properties,
+    additionalProperties: false
+  };
+}
+
 /**
  * Map index for O(1) property lookup by key name.
  */

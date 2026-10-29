@@ -1,0 +1,1018 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/Houssam-OUATMANI/lombok-config-vscode-extension/main/schemas/lombok-config.schema.json",
+  "title": "Lombok configuration properties",
+  "description": "JSON representation of known Lombok configuration properties. This schema does not validate the line-based lombok.config file format.",
+  "type": "object",
+  "properties": {
+    "config.stopBubbling": {
+      "title": "config.stopBubbling",
+      "description": "Tells the configuration system not to look in parent directories for more `lombok.config` files.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Configuration"
+    },
+    "lombok.addLombokGeneratedAnnotation": {
+      "title": "lombok.addLombokGeneratedAnnotation",
+      "description": "When `true`, Lombok adds `@lombok.Generated` to all generated methods, constructors, and types. This helps code coverage tools (such as JaCoCo) ignore generated code.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Code Generation"
+    },
+    "lombok.addJavaxGeneratedAnnotation": {
+      "title": "lombok.addJavaxGeneratedAnnotation",
+      "description": "When `true`, Lombok adds `@javax.annotation.Generated` to generated classes.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Code Generation"
+    },
+    "lombok.addJakartaGeneratedAnnotation": {
+      "title": "lombok.addJakartaGeneratedAnnotation",
+      "description": "When `true`, Lombok adds `@jakarta.annotation.Generated` to generated classes.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Code Generation"
+    },
+    "lombok.addNullAnnotations": {
+      "title": "lombok.addNullAnnotations",
+      "description": "Specifies which nullability annotations Lombok should add to generated getters, setters, and parameters.",
+      "type": "string",
+      "enum": [
+        "none",
+        "javax",
+        "eclipse",
+        "jetbrains",
+        "android",
+        "androidx",
+        "findbugs",
+        "spring",
+        "checkerframework",
+        "jspecify"
+      ],
+      "default": "none",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Nullability"
+    },
+    "lombok.accessors.fluent": {
+      "title": "lombok.accessors.fluent",
+      "description": "If `true`, generated getters and setters will be fluent (e.g. `foo()` instead of `getFoo()`, and `foo(String x)` instead of `setFoo(String x)`).",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Accessors"
+    },
+    "lombok.accessors.chain": {
+      "title": "lombok.accessors.chain",
+      "description": "If `true`, generated setters will return `this` to allow method chaining instead of `void`.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Accessors"
+    },
+    "lombok.accessors.prefix": {
+      "title": "lombok.accessors.prefix",
+      "description": "A list of prefixes to strip from field names when generating accessors (e.g. `+= m_` or `+= f_`). Supports `+=`, `-=`, and `clear`.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "x-lombok-type": "list",
+      "x-lombok-category": "Accessors"
+    },
+    "lombok.accessors.capitalization": {
+      "title": "lombok.accessors.capitalization",
+      "description": "Controls how Lombok capitalizes field names with a single leading lower-case letter followed by an upper-case letter (e.g., `uName`). `beanspec` preserves JavaBean specification quirks.",
+      "type": "string",
+      "enum": [
+        "basic",
+        "beanspec"
+      ],
+      "default": "basic",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Accessors"
+    },
+    "lombok.accessors.makeFinal": {
+      "title": "lombok.accessors.makeFinal",
+      "description": "If `true`, generated getters will be declared `final`.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Accessors"
+    },
+    "lombok.getter.noIsPrefix": {
+      "title": "lombok.getter.noIsPrefix",
+      "description": "If `true`, boolean getters will be named `getFoo()` instead of `isFoo()`.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Accessors"
+    },
+    "lombok.accessors.noIsPrefix": {
+      "title": "lombok.accessors.noIsPrefix",
+      "description": "Deprecated alias for `lombok.getter.noIsPrefix`.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "deprecated": true,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Accessors",
+      "x-lombok-deprecation-message": "Deprecated by Project Lombok. Use `lombok.getter.noIsPrefix` instead.",
+      "x-lombok-replacement": "lombok.getter.noIsPrefix = true"
+    },
+    "lombok.anyConstructor.addConstructorProperties": {
+      "title": "lombok.anyConstructor.addConstructorProperties",
+      "description": "If `true`, `@AllArgsConstructor`, `@RequiredArgsConstructor`, and `@NoArgsConstructor` will add `@java.beans.ConstructorProperties`.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Constructors"
+    },
+    "lombok.anyConstructor.suppressConstructorProperties": {
+      "title": "lombok.anyConstructor.suppressConstructorProperties",
+      "description": "Deprecated. If `true`, suppresses adding `@java.beans.ConstructorProperties`.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "deprecated": true,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Constructors",
+      "x-lombok-deprecation-message": "Deprecated by Project Lombok. Use `lombok.anyConstructor.addConstructorProperties = false` instead.",
+      "x-lombok-replacement": "lombok.anyConstructor.addConstructorProperties = false"
+    },
+    "lombok.noArgsConstructor.extraPrivate": {
+      "title": "lombok.noArgsConstructor.extraPrivate",
+      "description": "If `true`, Lombok generates a private no-args constructor if needed by frameworks (e.g. JPA / Hibernate).",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Constructors"
+    },
+    "lombok.equalsAndHashCode.doNotUseGetters": {
+      "title": "lombok.equalsAndHashCode.doNotUseGetters",
+      "description": "If `true`, Lombok uses direct field access instead of calling getters inside `equals` and `hashCode` implementations.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "EqualsAndHashCode"
+    },
+    "lombok.equalsAndHashCode.callSuper": {
+      "title": "lombok.equalsAndHashCode.callSuper",
+      "description": "Determines how `equals` and `hashCode` call the superclass method when extending a non-Object class: `call`, `ignore`, or `warn`.",
+      "type": "string",
+      "enum": [
+        "call",
+        "ignore",
+        "warn"
+      ],
+      "default": "warn",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "EqualsAndHashCode"
+    },
+    "lombok.equalsAndHashCode.warnWhenNoExplicitlyIncluded": {
+      "title": "lombok.equalsAndHashCode.warnWhenNoExplicitlyIncluded",
+      "description": "If `true`, Lombok emits a warning when `@EqualsAndHashCode(onlyExplicitlyIncluded = true)` is used without any explicit `@EqualsAndHashCode.Include` fields.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "EqualsAndHashCode"
+    },
+    "lombok.toString.doNotUseGetters": {
+      "title": "lombok.toString.doNotUseGetters",
+      "description": "If `true`, Lombok uses direct field access instead of calling getters inside `toString` implementations.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "ToString"
+    },
+    "lombok.toString.callSuper": {
+      "title": "lombok.toString.callSuper",
+      "description": "Determines whether `toString` calls superclass `toString` if the class extends a non-Object class: `call`, `ignore`, or `warn`.",
+      "type": "string",
+      "enum": [
+        "call",
+        "ignore",
+        "warn"
+      ],
+      "default": "warn",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "ToString"
+    },
+    "lombok.toString.includeFieldNames": {
+      "title": "lombok.toString.includeFieldNames",
+      "description": "Whether field names are included in generated `toString` representations.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": true,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "ToString"
+    },
+    "lombok.toString.onlyExplicitlyIncluded": {
+      "title": "lombok.toString.onlyExplicitlyIncluded",
+      "description": "If `true`, only fields and methods explicitly marked with `@ToString.Include` will be included in `toString`.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "ToString"
+    },
+    "lombok.builder.className": {
+      "title": "lombok.builder.className",
+      "description": "Pattern for generated builder class names. The asterisk `*` is replaced with the annotated class name (default: `*Builder`).",
+      "type": "string",
+      "default": "*Builder",
+      "x-lombok-type": "string",
+      "x-lombok-category": "Builder"
+    },
+    "lombok.superBuilder.className": {
+      "title": "lombok.superBuilder.className",
+      "description": "Pattern for generated SuperBuilder class names.",
+      "type": "string",
+      "default": "*Builder",
+      "x-lombok-type": "string",
+      "x-lombok-category": "Builder"
+    },
+    "lombok.singular.useGuava": {
+      "title": "lombok.singular.useGuava",
+      "description": "If `true`, Lombok uses Guava Immutable collections for `@Singular` fields instead of `java.util.Collections.unmodifiable*`.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Builder"
+    },
+    "lombok.singular.auto": {
+      "title": "lombok.singular.auto",
+      "description": "If `true`, Lombok automatically discovers singular forms of plural collection field names.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": true,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Builder"
+    },
+    "lombok.fieldDefaults.defaultPrivate": {
+      "title": "lombok.fieldDefaults.defaultPrivate",
+      "description": "If `true`, fields without explicit access modifiers will default to `private`.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "FieldDefaults"
+    },
+    "lombok.fieldDefaults.defaultFinal": {
+      "title": "lombok.fieldDefaults.defaultFinal",
+      "description": "If `true`, fields without explicit `final` modifiers will default to `final`.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "FieldDefaults"
+    },
+    "lombok.fieldNameConstants.prefix": {
+      "title": "lombok.fieldNameConstants.prefix",
+      "description": "Prefix to prepend to generated field name constants.",
+      "type": "string",
+      "x-lombok-type": "string",
+      "x-lombok-category": "FieldNameConstants"
+    },
+    "lombok.fieldNameConstants.suffix": {
+      "title": "lombok.fieldNameConstants.suffix",
+      "description": "Suffix to append to generated field name constants.",
+      "type": "string",
+      "x-lombok-type": "string",
+      "x-lombok-category": "FieldNameConstants"
+    },
+    "lombok.fieldNameConstants.uppercase": {
+      "title": "lombok.fieldNameConstants.uppercase",
+      "description": "If `true`, generated field name constants will be uppercase snake_case.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "FieldNameConstants"
+    },
+    "lombok.fieldNameConstants.asEnum": {
+      "title": "lombok.fieldNameConstants.asEnum",
+      "description": "If `true`, Lombok generates an `enum` instead of a static inner class of constants.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "FieldNameConstants"
+    },
+    "lombok.log.fieldName": {
+      "title": "lombok.log.fieldName",
+      "description": "The name of the generated logger field (e.g. `log` or `LOGGER`).",
+      "type": "string",
+      "default": "log",
+      "x-lombok-type": "identifier",
+      "x-lombok-category": "Logging"
+    },
+    "lombok.log.fieldIsStatic": {
+      "title": "lombok.log.fieldIsStatic",
+      "description": "Whether the generated logger field should be static.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": true,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Logging"
+    },
+    "lombok.log.custom.declaration": {
+      "title": "lombok.log.custom.declaration",
+      "description": "Declaration definition for `@CustomLog` (e.g. `my.pkg.CustomLogger my.pkg.LoggerFactory.getLogger(TYPE)`).",
+      "type": "string",
+      "x-lombok-type": "string",
+      "x-lombok-category": "Logging"
+    },
+    "lombok.nonNull.exceptionType": {
+      "title": "lombok.nonNull.exceptionType",
+      "description": "Exception type thrown when a `@NonNull` parameter is null.",
+      "type": "string",
+      "enum": [
+        "IllegalArgumentException",
+        "NullPointerException",
+        "Assertion",
+        "JDK",
+        "Guava"
+      ],
+      "default": "NullPointerException",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "NonNull"
+    },
+    "lombok.nonNull.customAnnotation": {
+      "title": "lombok.nonNull.customAnnotation",
+      "description": "Custom annotation type to use when Lombok generates null-checks (e.g. `com.example.MyNonNull`).",
+      "type": "string",
+      "x-lombok-type": "string",
+      "x-lombok-category": "NonNull"
+    },
+    "lombok.copyableAnnotations": {
+      "title": "lombok.copyableAnnotations",
+      "description": "List of annotations copied from fields onto generated getters, setters, withers, and constructors. Supports `+=`, `-=`, and `clear`.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "x-lombok-type": "list",
+      "x-lombok-category": "Annotations"
+    },
+    "lombok.jackson.jsonProperty": {
+      "title": "lombok.jackson.jsonProperty",
+      "description": "Whether to automatically copy `@JsonProperty` to generated builder setter methods.",
+      "type": "string",
+      "enum": [
+        "generate",
+        "ignore"
+      ],
+      "default": "ignore",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Jackson"
+    },
+    "lombok.extern.findbugs.addSuppressFBWarnings": {
+      "title": "lombok.extern.findbugs.addSuppressFBWarnings",
+      "description": "When `true`, Lombok adds `@edu.umd.cs.findbugs.annotations.SuppressFBWarnings` to generated code.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Code Quality"
+    },
+    "lombok.disableConfig": {
+      "title": "lombok.disableConfig",
+      "description": "If `true`, Lombok completely stops processing any configuration files in this directory or subdirectories.",
+      "type": "boolean",
+      "enum": [
+        true,
+        false
+      ],
+      "default": false,
+      "x-lombok-type": "boolean",
+      "x-lombok-category": "Configuration"
+    },
+    "lombok.accessors.flagUsage": {
+      "title": "lombok.accessors.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@accessors`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.allArgsConstructor.flagUsage": {
+      "title": "lombok.allArgsConstructor.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@allArgsConstructor`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.noArgsConstructor.flagUsage": {
+      "title": "lombok.noArgsConstructor.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@noArgsConstructor`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.requiredArgsConstructor.flagUsage": {
+      "title": "lombok.requiredArgsConstructor.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@requiredArgsConstructor`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.cleanup.flagUsage": {
+      "title": "lombok.cleanup.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@cleanup`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.data.flagUsage": {
+      "title": "lombok.data.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@data`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.delegate.flagUsage": {
+      "title": "lombok.delegate.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@delegate`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.equalsAndHashCode.flagUsage": {
+      "title": "lombok.equalsAndHashCode.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@equalsAndHashCode`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.experimental.flagUsage": {
+      "title": "lombok.experimental.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@experimental`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.extensionMethod.flagUsage": {
+      "title": "lombok.extensionMethod.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@extensionMethod`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.fieldDefaults.flagUsage": {
+      "title": "lombok.fieldDefaults.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@fieldDefaults`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.fieldNameConstants.flagUsage": {
+      "title": "lombok.fieldNameConstants.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@fieldNameConstants`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.getter.flagUsage": {
+      "title": "lombok.getter.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@getter`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.setter.flagUsage": {
+      "title": "lombok.setter.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@setter`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.helper.flagUsage": {
+      "title": "lombok.helper.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@helper`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.log.flagUsage": {
+      "title": "lombok.log.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@log`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.log.apacheCommons.flagUsage": {
+      "title": "lombok.log.apacheCommons.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@log.apacheCommons`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.log.javaUtilLogging.flagUsage": {
+      "title": "lombok.log.javaUtilLogging.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@log.javaUtilLogging`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.log.jbosslog.flagUsage": {
+      "title": "lombok.log.jbosslog.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@log.jbosslog`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.log.log4j.flagUsage": {
+      "title": "lombok.log.log4j.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@log.log4j`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.log.log4j2.flagUsage": {
+      "title": "lombok.log.log4j2.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@log.log4j2`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.log.slf4j.flagUsage": {
+      "title": "lombok.log.slf4j.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@log.slf4j`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.log.xslf4j.flagUsage": {
+      "title": "lombok.log.xslf4j.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@log.xslf4j`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.log.flogger.flagUsage": {
+      "title": "lombok.log.flogger.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@log.flogger`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.log.custom.flagUsage": {
+      "title": "lombok.log.custom.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@log.custom`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.nonNull.flagUsage": {
+      "title": "lombok.nonNull.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@nonNull`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.sneakyThrows.flagUsage": {
+      "title": "lombok.sneakyThrows.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@sneakyThrows`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.standardException.flagUsage": {
+      "title": "lombok.standardException.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@standardException`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.synchronized.flagUsage": {
+      "title": "lombok.synchronized.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@synchronized`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.toString.flagUsage": {
+      "title": "lombok.toString.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@toString`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.val.flagUsage": {
+      "title": "lombok.val.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@val`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.var.flagUsage": {
+      "title": "lombok.var.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@var`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.value.flagUsage": {
+      "title": "lombok.value.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@value`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.wither.flagUsage": {
+      "title": "lombok.wither.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@wither`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.with.flagUsage": {
+      "title": "lombok.with.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@with`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.builder.flagUsage": {
+      "title": "lombok.builder.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@builder`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.superBuilder.flagUsage": {
+      "title": "lombok.superBuilder.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@superBuilder`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.utilityClass.flagUsage": {
+      "title": "lombok.utilityClass.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@utilityClass`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.anyConstructor.flagUsage": {
+      "title": "lombok.anyConstructor.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@anyConstructor`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.jacksonized.flagUsage": {
+      "title": "lombok.jacksonized.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@jacksonized`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    },
+    "lombok.locked.flagUsage": {
+      "title": "lombok.locked.flagUsage",
+      "description": "Configures compiler diagnostic level when using `@locked`: `allow` (permitted), `warning` (emits compiler warning), or `error` (compilation fails).",
+      "type": "string",
+      "enum": [
+        "warning",
+        "error",
+        "allow"
+      ],
+      "default": "allow",
+      "x-lombok-type": "enum",
+      "x-lombok-category": "Flag Usage"
+    }
+  },
+  "additionalProperties": false
+}

@@ -66,6 +66,10 @@ Lombok Sense maintains a typed schema of the Lombok configuration specification:
 - Directives (`config.stopBubbling`, `clear <property>`)
 - Governance flags across all Lombok annotations (`lombok.<feature>.flagUsage`)
 
+## Machine-readable schema
+
+`schemas/lombok-config.schema.json` is generated from the same property definitions used by completion and diagnostics. It describes Lombok properties as a JSON object for external tooling and includes types, allowed values, defaults, and deprecation metadata. Since `lombok.config` is a line-based format rather than JSON, this schema does not directly validate `lombok.config` files. Run `npm run generate-schema` after changing the property definitions.
+
 ## Development
 
 ```bash
