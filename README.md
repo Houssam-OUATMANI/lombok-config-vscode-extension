@@ -2,6 +2,8 @@
 
 Language support for Project Lombok configuration files (`lombok.config`) in Visual Studio Code.
 
+See [CHANGELOG.md](CHANGELOG.md) for release notes.
+
 ## Features
 
 - **Effective Configuration Engine**:
@@ -78,7 +80,11 @@ Lombok Sense maintains a typed schema of the Lombok configuration specification:
 npm install
 
 # Run unit tests
+npm run build-test
 npm test
+
+# Check types
+npm run typecheck
 
 # Build production bundle
 npm run build-prod

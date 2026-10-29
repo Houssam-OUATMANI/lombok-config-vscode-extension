@@ -2,6 +2,18 @@
 
 All notable changes to the "lombok-sense" extension will be documented in this file.
 
+## [2.0.0] - 2026-10-29
+
+### Added
+- Generated machine-readable JSON schema for Lombok configuration properties, kept in sync with the extension's property model.
+- Configurable workspace annotation indexing with custom exclusion globs and cancellation of superseded scans.
+- GitHub Actions CI on Ubuntu and Windows for schema validation, type-checking, tests, and production builds.
+
+### Improved
+- Workspace annotation indexing now distinguishes annotations declared in the workspace from annotations inferred from Java imports and built-in framework suggestions.
+- Annotation discovery ignores comments and string literals to reduce false positives.
+- Added diagnostics for missing property values and protection against accidentally overwriting an existing root `lombok.config`.
+
 ## [1.0.0] - 2026-10-19
 
 ### Added

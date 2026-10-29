@@ -2,7 +2,7 @@
   "name": "lombok-sense",
   "displayName": "Lombok Sense",
   "description": "Comprehensive, first-class language support for Lombok configuration (lombok.config): syntax highlighting, smart autocomplete, workspace annotation resolution, hover documentation, diagnostics, quick fixes, and formatting.",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "publisher": "houssam-ouatmani",
   "engines": {
     "vscode": "^1.85.0"
